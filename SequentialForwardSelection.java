@@ -1,66 +1,81 @@
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by ben on 8/04/17.
  */
-public class SequentialForwardSelection<E> implements FeatureSelection<E> {
+public class SequentialForwardSelection extends FeatureSelection {
 
-    public Set<E> select(final Set<E> original, int numFeatures){
-        // Nothing we can do if the number of features is greater than or equal to the total size
-        if (numFeatures >= original.size()){
-            return original;
+    public Set<Integer> select(final Set<Instance> instances, int numFeaturesToSelect) {
+        // In this case we have no data to use, so return the empty set
+        if(instances == null || instances.isEmpty()) return new HashSet<Integer>();
+
+        // Extract an instance to check the amount of features, assumes all instances have same # of features
+        Instance sampleInstance = instances.iterator().next();
+        int totalFeatures = sampleInstance.getNumFeatures();
+
+        // To begin with no features are selected, so all the indices from 0..totalFeatures are remaining
+        Set<Integer> remainingFeatures = IntStream.rangeClosed(0, totalFeatures)
+                .boxed().collect(Collectors.toSet());
+
+        // Nothing we can do if the number of features to select is greater than or equal to the total size
+        if (numFeaturesToSelect >= totalFeatures){
+            return remainingFeatures;
         }
 
-        // Duplicate the input set, so we do not alter the original collection
-        Set<E> remainingFeatures = new HashSet<E>(original);
+        // Subset of only selected features indices
+        Set<Integer> selectedFeatures = new HashSet<>();
 
-        // Subset of only selected features
-        Set<E> selectedFeatures = new HashSet<>();
+        while (selectedFeatures.size() < numFeaturesToSelect){
+            int feature = max(instances, selectedFeatures, remainingFeatures);
 
-        while (selectedFeatures.size() < numFeatures){
-            E feature = max(selectedFeatures, remainingFeatures);
+            // No more valid features
+            if (feature == -1) break;
 
+            selectedFeatures.add(feature);
             // Remove the feature so we do not keep selecting the same one
-            original.remove(feature);
+            remainingFeatures.remove(feature);
         }
 
         return selectedFeatures;
     }
 
-    public Set<E> select(final Set<E> original){
-        // Duplicate the input set, so we do not alter the original collection
-        Set<E> remainingFeatures = new HashSet<E>(original);
-        // Finds the given amount of features
-        return null;
-    }
+    public Set<Integer> select(final Set<Instance> instances, double goalAccuracy) {
+        // In this case we have no data to use, so return the empty set
+        if (instances == null || instances.isEmpty()) return new HashSet<Integer>();
 
-    /**
-     * Returns the feature in remaining features
-     * which maximises the objective function.
-     *
-     * @param selectedFeatures
-     * @param remainingFeatures
-     * @return
-     */
-    private E max(Set<E> selectedFeatures, Set<E> remainingFeatures){
-        double highest = -1;
-        E selected = null;
+        // Extract an instance to check the amount of features, assumes all instances have same # of features
+        Instance sampleInstance = instances.iterator().next();
+        int totalFeatures = sampleInstance.getNumFeatures();
 
-        for(E feature: remainingFeatures){
-            double result = objectiveFunction(selectedFeatures, feature);
-            if(result > highest){
-                highest = result;
-                selected = feature;
-            }
+        // To begin with no features are selected, so all the indices from 0..totalFeatures are remaining
+        Set<Integer> remainingFeatures = IntStream.rangeClosed(0, totalFeatures)
+                .boxed().collect(Collectors.toSet());
+
+        // Subset of only selected features indices
+        Set<Integer> selectedFeatures = new HashSet<>();
+
+        // Track classifiction accuracy
+        double accuracy = 0;
+
+        while (accuracy < goalAccuracy){
+            int feature = max(instances, selectedFeatures, remainingFeatures);
+            // No more valid features
+            if (feature == -1) break;
+
+            selectedFeatures.add(feature);
+            // Remove the feature so we do not keep selecting the same one
+            remainingFeatures.remove(feature);
+
+            accuracy = objectiveFunction(instances, selectedFeatures);
         }
 
-        return selected;
+        return selectedFeatures;
     }
 
-    private double objectiveFunction(Set<E> selectedFeatures, E feature){
-        return 0;
-    }
+
 
 
 }
