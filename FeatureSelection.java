@@ -26,12 +26,15 @@ public abstract class FeatureSelection {
      * @param remainingFeatures
      * @return
      */
-    protected int max(Set<Instance> instances, Set<Integer> selectedFeatures, Set<Integer> remainingFeatures){
+    protected int best(Set<Instance> instances, Set<Integer> selectedFeatures, Set<Integer> remainingFeatures){
         double highest = -Integer.MAX_VALUE;
         int selected = -1;
 
         for(int feature: remainingFeatures){
-            double result = objectiveFunction(instances, selectedFeatures, feature);
+            Set<Integer> newFeatures = new HashSet<>(selectedFeatures);
+            newFeatures.add(feature);
+
+            double result = objectiveFunction(instances, newFeatures);
             if(result > highest){
                 highest = result;
                 selected = feature;
@@ -41,14 +44,33 @@ public abstract class FeatureSelection {
         return selected;
     }
 
-    protected double objectiveFunction(Set<Instance> instances, Set<Integer> selectedFeatures) {
-        return 0;
+    /**
+     * Finds and returns the index of the worst feature,
+     * where worst is defined by
+     * @param instances
+     * @param features
+     * @return
+     */
+    protected int worst(Set<Instance> instances, Set<Integer> features){
+        double lowestAccuracy = Integer.MAX_VALUE;
+        int selected = -1;
+
+        for(int feature: features){
+            Set<Integer> newFeatures = new HashSet<>(features);
+            newFeatures.remove(feature);
+
+            double result = objectiveFunction(instances, newFeatures);
+            if(result < lowestAccuracy){
+                lowestAccuracy = result;
+                selected = feature;
+            }
+        }
+
+        return selected;
     }
 
-    protected double objectiveFunction(Set<Instance> instances, Set<Integer> selectedFeatures, int feature) {
-        Set<Integer> features = new HashSet<>(selectedFeatures);
-        features.add(feature);
-        return objectiveFunction(instances, features);
+    protected double objectiveFunction(Set<Instance> instances, Set<Integer> selectedFeatures) {
+        return 0;
     }
 
 

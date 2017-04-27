@@ -29,7 +29,7 @@ public class SequentialForwardSelection extends FeatureSelection {
         Set<Integer> selectedFeatures = new HashSet<>();
 
         while (selectedFeatures.size() < numFeaturesToSelect){
-            int feature = max(instances, selectedFeatures, remainingFeatures);
+            int feature = best(instances, selectedFeatures, remainingFeatures);
 
             // No more valid features
             if (feature == -1) break;
@@ -61,7 +61,7 @@ public class SequentialForwardSelection extends FeatureSelection {
         double accuracy = 0;
 
         while (accuracy < goalAccuracy){
-            int feature = max(instances, selectedFeatures, remainingFeatures);
+            int feature = best(instances, selectedFeatures, remainingFeatures);
             // No more valid features
             if (feature == -1) break;
 
