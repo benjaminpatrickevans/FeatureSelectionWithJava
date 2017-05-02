@@ -17,7 +17,7 @@ public class SequentialForwardSelection extends FeatureSelection {
         int totalFeatures = sampleInstance.getNumFeatures();
 
         // To begin with no features are selected, so all the indices from 0..totalFeatures are remaining
-        Set<Integer> remainingFeatures = IntStream.rangeClosed(0, totalFeatures)
+        Set<Integer> remainingFeatures = IntStream.rangeClosed(0, totalFeatures - 1)
                 .boxed().collect(Collectors.toSet());
 
         // Nothing we can do if the number of features to select is greater than or equal to the total size
@@ -28,8 +28,10 @@ public class SequentialForwardSelection extends FeatureSelection {
         // Subset of only selected features indices
         Set<Integer> selectedFeatures = new HashSet<>();
 
+        Classifier classifier = new Classifier(instances);
+
         while (selectedFeatures.size() < numFeaturesToSelect){
-            int feature = best(instances, selectedFeatures, remainingFeatures);
+            int feature = best(classifier, selectedFeatures, remainingFeatures);
 
             // No more valid features
             if (feature == -1) break;
@@ -39,6 +41,7 @@ public class SequentialForwardSelection extends FeatureSelection {
             remainingFeatures.remove(feature);
         }
 
+        compareAccuracy(classifier, selectedFeatures, totalFeatures);
         return selectedFeatures;
     }
 
@@ -51,7 +54,7 @@ public class SequentialForwardSelection extends FeatureSelection {
         int totalFeatures = sampleInstance.getNumFeatures();
 
         // To begin with no features are selected, so all the indices from 0..totalFeatures are remaining
-        Set<Integer> remainingFeatures = IntStream.rangeClosed(0, totalFeatures)
+        Set<Integer> remainingFeatures = IntStream.rangeClosed(0, totalFeatures - 1)
                 .boxed().collect(Collectors.toSet());
 
         // Subset of only selected features indices
@@ -60,8 +63,10 @@ public class SequentialForwardSelection extends FeatureSelection {
         // Track classifiction accuracy
         double accuracy = 0;
 
+        Classifier classifier = new Classifier(instances);
+
         while (accuracy < goalAccuracy){
-            int feature = best(instances, selectedFeatures, remainingFeatures);
+            int feature = best(classifier, selectedFeatures, remainingFeatures);
             // No more valid features
             if (feature == -1) break;
 
@@ -69,9 +74,10 @@ public class SequentialForwardSelection extends FeatureSelection {
             // Remove the feature so we do not keep selecting the same one
             remainingFeatures.remove(feature);
 
-            accuracy = objectiveFunction(instances, selectedFeatures);
+            accuracy = objectiveFunction(classifier, selectedFeatures);
         }
 
+        compareAccuracy(classifier, selectedFeatures, totalFeatures);
         return selectedFeatures;
     }
 

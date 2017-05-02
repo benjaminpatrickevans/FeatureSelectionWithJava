@@ -18,7 +18,7 @@ public class SequentialBackwardsSelection extends FeatureSelection {
         int totalFeatures = sampleInstance.getNumFeatures();
 
         // To begin with all features are selected
-        Set<Integer> selectedFeatures = IntStream.rangeClosed(0, totalFeatures)
+        Set<Integer> selectedFeatures = IntStream.rangeClosed(0, totalFeatures - 1)
                 .boxed().collect(Collectors.toSet());
 
         // Nothing we can do if the number of features to select is greater than or equal to the total size
@@ -26,8 +26,10 @@ public class SequentialBackwardsSelection extends FeatureSelection {
             return selectedFeatures;
         }
 
+        Classifier classifier = new Classifier(instances);
+
         while (selectedFeatures.size() >= numFeaturesToSelect){
-            int feature = worst(instances, selectedFeatures);
+            int feature = worst(classifier, selectedFeatures);
 
             // No more valid features
             if (feature == -1) break;

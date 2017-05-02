@@ -1,10 +1,14 @@
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Created by ben on 8/04/17.
  */
 public abstract class FeatureSelection {
+
+
     /**
     Returns a subset of only the most important features
     chosen by some measure.
@@ -26,7 +30,7 @@ public abstract class FeatureSelection {
      * @param remainingFeatures
      * @return
      */
-    protected int best(Set<Instance> instances, Set<Integer> selectedFeatures, Set<Integer> remainingFeatures){
+    protected int best(Classifier classifier, Set<Integer> selectedFeatures, Set<Integer> remainingFeatures){
         double highest = -Integer.MAX_VALUE;
         int selected = -1;
 
@@ -34,7 +38,7 @@ public abstract class FeatureSelection {
             Set<Integer> newFeatures = new HashSet<>(selectedFeatures);
             newFeatures.add(feature);
 
-            double result = objectiveFunction(instances, newFeatures);
+            double result = objectiveFunction(classifier, newFeatures);
             if(result > highest){
                 highest = result;
                 selected = feature;
@@ -51,7 +55,7 @@ public abstract class FeatureSelection {
      * @param features
      * @return
      */
-    protected int worst(Set<Instance> instances, Set<Integer> features){
+    protected int worst(Classifier classifier, Set<Integer> features){
         double lowestAccuracy = Integer.MAX_VALUE;
         int selected = -1;
 
@@ -59,7 +63,7 @@ public abstract class FeatureSelection {
             Set<Integer> newFeatures = new HashSet<>(features);
             newFeatures.remove(feature);
 
-            double result = objectiveFunction(instances, newFeatures);
+            double result = objectiveFunction(classifier, newFeatures);
             if(result < lowestAccuracy){
                 lowestAccuracy = result;
                 selected = feature;
@@ -69,8 +73,15 @@ public abstract class FeatureSelection {
         return selected;
     }
 
-    protected double objectiveFunction(Set<Instance> instances, Set<Integer> selectedFeatures) {
-        return 0;
+    public void compareAccuracy(Classifier classifier, Set<Integer> selectedIndices, int totalFeatures) {
+        Set<Integer> allIndices = IntStream.rangeClosed(0, totalFeatures - 1)
+                .boxed().collect(Collectors.toSet());
+        System.out.println("Classification accuracy on testing set using all features: " + classifier.classify(allIndices));
+        System.out.println("Classification accuracy on testing set using features " + selectedIndices + ": " + classifier.classify(selectedIndices));
+    }
+
+    protected double objectiveFunction(Classifier classifier, Set<Integer> selectedFeatures) {
+        return classifier.classify(selectedFeatures);
     }
 
 
