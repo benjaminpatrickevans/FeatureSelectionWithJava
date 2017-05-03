@@ -1,11 +1,10 @@
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.PriorityQueue;
-import java.util.Scanner;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 
 /**
@@ -30,6 +29,21 @@ public class Classifier {
         }
     }
 
+    /**
+     * Classifies and calculates the percentage
+     * of correct classifications in the testingSet
+     * against the training set.
+     */
+    public double classify(){
+        Instance sampleInstance = training.iterator().next();
+        int totalFeatures = sampleInstance.getNumFeatures();
+
+        // To begin with all features are selected
+        Set<Integer> allIndices =  IntStream.rangeClosed(0, totalFeatures - 1)
+                .boxed().collect(Collectors.toSet());
+
+        return classify(allIndices);
+    }
     /**
      * Classifies and calculates the percentage
      * of correct classifications in the testingSet
@@ -69,6 +83,7 @@ public class Classifier {
 
         return correct/(double)testing.size();
     }
+
 
     /**
      * Returns the mode of @param list

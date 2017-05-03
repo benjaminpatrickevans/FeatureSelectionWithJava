@@ -27,6 +27,17 @@ public class Instance  {
 
     public double getFeature(int index){ return features[index]; }
 
+    public Instance createInstance(Set<Integer> featureIndices){
+        double[] features = new double[featureIndices.size()];
+
+        int i=0;
+        for(int index: featureIndices){
+            features[i++] = features[index];
+        }
+
+        return new Instance(features , label);
+    }
+
     public double distanceTo(Instance other,  Set<Integer> indices){
         if(getNumFeatures() != other.getNumFeatures()) throw new IllegalArgumentException("Number of features do not match");
 
