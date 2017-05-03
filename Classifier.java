@@ -29,6 +29,11 @@ public class Classifier {
         }
     }
 
+    public Classifier(Set<Instance> training, Set<Instance> testing){
+        this.training = training;
+        this.testing = testing;
+    }
+
     /**
      * Classifies and calculates the percentage
      * of correct classifications in the testingSet

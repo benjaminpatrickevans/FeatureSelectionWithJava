@@ -11,13 +11,13 @@ public class SequentialBackwardsSelection extends FeatureSelection {
     }
 
     @Override
-    public Set<Integer> select(int numFeaturesToSelect) {
-        return select((features, size) -> size > numFeaturesToSelect);
+    public Set<Integer> select(int maxNumFeatures) {
+        return select((accuracy, size) -> size > maxNumFeatures);
     }
 
     @Override
-    public Set<Integer> select(double goalAccuracy) {
-        return select((features, size) -> objectiveFunction(features) < goalAccuracy);
+    public Set<Integer> select(double minimumAccuracy) {
+        return select((accuracy, size) -> accuracy < minimumAccuracy);
     }
 
     public Set<Integer> select(Criteria criteria) {
@@ -27,7 +27,12 @@ public class SequentialBackwardsSelection extends FeatureSelection {
         // To begin with all features are selected
         Set<Integer> selectedFeatures = getFeatures();
 
-        while (criteria.evaluate(selectedFeatures, selectedFeatures.size())){
+        // Keep track of the best solution, so we never get worse
+        double highestAccuracy = 0;
+        Set<Integer> bestSoFar = new HashSet<>();
+        double accuracy = objectiveFunction(selectedFeatures);
+
+        while (criteria.evaluate(accuracy, selectedFeatures.size())){
             int feature = worst(selectedFeatures);
 
             // No more valid features
@@ -35,8 +40,16 @@ public class SequentialBackwardsSelection extends FeatureSelection {
 
             // Remove the feature so we do not keep selecting the same one
             selectedFeatures.remove(feature);
+
+            accuracy = objectiveFunction(selectedFeatures);
+
+            if (accuracy > highestAccuracy) {
+                highestAccuracy = accuracy;
+                // Make a copy, so we don't accidentally modify this
+                bestSoFar = new HashSet<>(selectedFeatures);
+            }
         }
 
-        return selectedFeatures;
+        return bestSoFar;
     }
 }

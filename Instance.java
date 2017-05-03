@@ -51,4 +51,8 @@ public class Instance  {
         return diff;
     }
 
+    @Override
+    public String toString() {
+        return label + ":  " + features;
+    }
 }

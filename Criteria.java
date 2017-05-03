@@ -1,5 +1,5 @@
 import java.util.Set;
 
 public interface Criteria {
-    public boolean evaluate(Set<Integer> features, int size);
+    public boolean evaluate(double accuracy, int size);
 }

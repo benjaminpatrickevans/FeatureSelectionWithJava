@@ -17,17 +17,19 @@ public abstract class FeatureSelection {
     }
 
     /**
-    Returns a subset of only the most important features
-    chosen by some measure.
+        Returns a subset of only the most important features,
+     the parameter specifies the maximum number of features to select (m).
+     If a number of features is found (n), where n < m, with a higher accuracy,
+     this set will be returned instead.
      */
-   public abstract Set<Integer> select(int numFeaturesToSelect);
+   public abstract Set<Integer> select(int maxNumFeatures);
 
    /**
    Returns a subset containing only the numFeatures most important
     features. If numFeatures is >= original.size(), the original
     set is returned.
     */
-   public abstract Set<Integer> select(double goalAccuracy);
+   public abstract Set<Integer> select(double minimumAccuracy);
 
     /**
      * Returns the feature in remaining features
@@ -63,7 +65,7 @@ public abstract class FeatureSelection {
      * @return
      */
     protected int worst(Set<Integer> features){
-        double lowestAccuracy = Integer.MAX_VALUE;
+        double highestAccuracy = -Integer.MAX_VALUE;
         int selected = -1;
 
         for(int feature: features){
@@ -71,8 +73,8 @@ public abstract class FeatureSelection {
             newFeatures.remove(feature);
 
             double result = objectiveFunction(newFeatures);
-            if(result < lowestAccuracy){
-                lowestAccuracy = result;
+            if(result > highestAccuracy){
+                highestAccuracy = result;
                 selected = feature;
             }
         }
