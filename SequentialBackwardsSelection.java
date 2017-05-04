@@ -12,27 +12,37 @@ public class SequentialBackwardsSelection extends FeatureSelection {
 
     @Override
     public Set<Integer> select(int maxNumFeatures) {
-        return select((accuracy, size) -> size > maxNumFeatures);
+        // While we have too many features or the accuracy is still improving
+        return select((noImprovement, size) -> size > maxNumFeatures || noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS, maxNumFeatures);
     }
 
     @Override
-    public Set<Integer> select(double minimumAccuracy) {
-        return select((accuracy, size) -> accuracy < minimumAccuracy);
+    public Set<Integer> select() {
+        // While the accuracy is still improving
+        return select((noImprovement, size) -> noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS);
     }
 
     public Set<Integer> select(Criteria criteria) {
+        return select(criteria, instances.size());
+    }
+
+    public Set<Integer> select(Criteria criteria, int maxNumFeatures) {
         // In this case we have no data to use, so return the empty set
         if (instances == null || instances.isEmpty()) return new HashSet<Integer>();
 
         // To begin with all features are selected
-        Set<Integer> selectedFeatures = getFeatures();
+        Set<Integer> selectedFeatures = getAllFeatureIndices();
 
         // Keep track of the best solution, so we never get worse
         double highestAccuracy = 0;
         Set<Integer> bestSoFar = new HashSet<>();
         double accuracy = objectiveFunction(selectedFeatures);
+        double lastAccuracy = accuracy;
 
-        while (criteria.evaluate(accuracy, selectedFeatures.size())){
+        // Number of iterations with no improvement
+        double noImprovement = 0;
+
+        while (criteria.evaluate(noImprovement, selectedFeatures.size())){
             int feature = worst(selectedFeatures);
 
             // No more valid features
@@ -43,11 +53,19 @@ public class SequentialBackwardsSelection extends FeatureSelection {
 
             accuracy = objectiveFunction(selectedFeatures);
 
-            if (accuracy > highestAccuracy) {
+            // If this is the highest so far, and also valid (i.e < number of features required)
+            if (accuracy > highestAccuracy && selectedFeatures.size() <= maxNumFeatures) {
                 highestAccuracy = accuracy;
                 // Make a copy, so we don't accidentally modify this
                 bestSoFar = new HashSet<>(selectedFeatures);
             }
+
+            if (Double.compare(accuracy, lastAccuracy) <= 0){
+                noImprovement++;
+            } else{
+                noImprovement = 0;
+            }
+            lastAccuracy = accuracy;
         }
 
         return bestSoFar;

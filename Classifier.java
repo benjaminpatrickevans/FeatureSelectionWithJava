@@ -8,7 +8,9 @@ import java.util.stream.IntStream;
 
 
 /**
- * K-NN used as a classifier.
+ * Classifier to use as the evaluation criteria
+ * for feature selection. K-Nearest neigbhour is
+ * implemented here.
  */
 public class Classifier {
 
@@ -35,24 +37,25 @@ public class Classifier {
     }
 
     /**
-     * Classifies and calculates the percentage
-     * of correct classifications in the testingSet
-     * against the training set.
+     * Classifies and returns the percentage
+     * of correct classifications using every feature
+     * in the instances.
+     *
      */
     public double classify(){
         Instance sampleInstance = training.iterator().next();
         int totalFeatures = sampleInstance.getNumFeatures();
 
-        // To begin with all features are selected
+        // We are using all features
         Set<Integer> allIndices =  IntStream.rangeClosed(0, totalFeatures - 1)
                 .boxed().collect(Collectors.toSet());
 
         return classify(allIndices);
     }
     /**
-     * Classifies and calculates the percentage
-     * of correct classifications in the testingSet
-     * against the training set.
+     * Classifies and returns the percentage
+     * of correct classifications using only the specified indices
+     * for the instances.
      */
     public double classify(Set<Integer> indices) {
         int correct = 0;

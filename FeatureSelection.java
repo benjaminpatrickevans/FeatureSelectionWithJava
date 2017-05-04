@@ -11,6 +11,9 @@ public abstract class FeatureSelection {
     private Classifier classifier;
     protected Set<Instance> instances;
 
+    // The number of times to try extra subsets if no improvement is made
+    protected final int MAX_ITERATIONS_WITHOUT_PROGRESS = 5;
+
     public FeatureSelection(Set<Instance> instances){
         this.instances = instances;
         this.classifier = new Classifier(instances);
@@ -29,7 +32,7 @@ public abstract class FeatureSelection {
     features. If numFeatures is >= original.size(), the original
     set is returned.
     */
-   public abstract Set<Integer> select(double minimumAccuracy);
+   public abstract Set<Integer> select();
 
     /**
      * Returns the feature in remaining features
@@ -86,7 +89,7 @@ public abstract class FeatureSelection {
         return classifier.classify(selectedFeatures);
     }
 
-    protected Set<Integer> getFeatures(){
+    protected Set<Integer> getAllFeatureIndices(){
         // Extract an instance to check the amount of features, assumes all instances have same # of features
         Instance sampleInstance = instances.iterator().next();
         int totalFeatures = sampleInstance.getNumFeatures();
@@ -96,7 +99,7 @@ public abstract class FeatureSelection {
                 .boxed().collect(Collectors.toSet());
     }
 
-    public void compareAccuracy(Set<Integer> selectedIndices) {
+    public void compareTestingAccuracy(Set<Integer> selectedIndices) {
         System.out.println("Classification accuracy on testing set using all features: " + classifier.classify());
         System.out.println("Classification accuracy on testing set using features " + selectedIndices + ": " + classifier.classify(selectedIndices));
     }

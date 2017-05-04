@@ -14,8 +14,8 @@ public class SequentialForwardSelection extends FeatureSelection {
        return select((accuracy, size) -> size < maxNumFeatures);
     }
 
-    public Set<Integer> select(double minimumAccuracy) {
-        return select((accuracy, size) -> accuracy < minimumAccuracy);
+    public Set<Integer> select() {
+        return select((noImprovement, size) -> noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS);
     }
 
     public Set<Integer> select(Criteria criteria) {
@@ -23,7 +23,7 @@ public class SequentialForwardSelection extends FeatureSelection {
         if (instances == null || instances.isEmpty()) return new HashSet<Integer>();
 
         // To begin with no features are selected, so all the indices from 0..totalFeatures are remaining
-        Set<Integer> remainingFeatures = getFeatures();
+        Set<Integer> remainingFeatures = getAllFeatureIndices();
 
         // Subset of only selected features indices
         Set<Integer> selectedFeatures = new HashSet<>();
@@ -34,8 +34,12 @@ public class SequentialForwardSelection extends FeatureSelection {
         double highestAccuracy = 0;
         Set<Integer> bestSoFar = new HashSet<>();
         double accuracy = objectiveFunction(selectedFeatures);
+        double lastAccuracy = accuracy;
 
-        while (criteria.evaluate(accuracy, selectedFeatures.size())){
+        // Number of iterations with no improvement
+        double noImprovement = 0;
+
+        while (criteria.evaluate(noImprovement, selectedFeatures.size())){
             int feature = best(selectedFeatures, remainingFeatures);
             // No more valid features
             if (feature == -1) break;
@@ -51,6 +55,13 @@ public class SequentialForwardSelection extends FeatureSelection {
                 // Make a copy, so we don't accidentally modify this
                 bestSoFar = new HashSet<>(selectedFeatures);
             }
+
+            if (Double.compare(accuracy, lastAccuracy) <= 0){
+                noImprovement++;
+            } else{
+                noImprovement = 0;
+            }
+            lastAccuracy = accuracy;
         }
 
         return bestSoFar;
