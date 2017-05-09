@@ -1,5 +1,13 @@
-# feature-selection
-Common feature selection algorithms implemented in Java, including SFS, SBS, SFFS and SFBS.
+# Feature Selection
+
+Common feature selection algorithms implemented in Java, including 
+
+- [Sequential Forward Selection (SFS)](selection/SequentialForwardSelection.java)
+- [Sequential Backward Selection (SBS)](selection/SequentialBackwardsSelection.java)
+- [Sequential Forward Floating Selection (SFFS)](selection/SequentialFloatingForwardSelection.java)
+- [Sequential Backward Floating Selection (SFBS)](selection/SequentialFloatingBackwardSelection.java)
+
+This uses a Wrapper approach, utilising K-NN as a classifier.
 
 Datasets used for testing:
 
