@@ -138,8 +138,8 @@ public abstract class FeatureSelection {
      */
     public void compareTestingAccuracy(Set<Integer> selectedIndices) {
         Classifier testingClassifier = new KNearestNeighbour(testingInstances);
-        System.out.println("Classification accuracy on testing set using all features: " + testingClassifier.classify());
-        System.out.println("Classification accuracy on testing set using features " + selectedIndices + ": " + testingClassifier.classify(selectedIndices));
+        System.out.printf("Accuracy using all features: %.3f%%\n", testingClassifier.classify() * 100);
+        System.out.printf("Accuracy using features (%s): %.3f%%\n", selectedIndices, testingClassifier.classify(selectedIndices) * 100);
     }
 
 

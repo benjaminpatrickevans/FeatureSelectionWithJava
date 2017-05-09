@@ -6,13 +6,13 @@ import java.util.Set;
 /**
  * Created by ben on 18/04/17.
  */
-public class SequentialBackwardsSelection extends FeatureSelection {
+public class SequentialBackwardSelection extends FeatureSelection {
 
-    public SequentialBackwardsSelection(Set<Instance> instances){
+    public SequentialBackwardSelection(Set<Instance> instances){
         super(instances);
     }
 
-    public SequentialBackwardsSelection(Set<Instance> training, Set<Instance> testing){
+    public SequentialBackwardSelection(Set<Instance> training, Set<Instance> testing){
         super(training, testing);
     }
 

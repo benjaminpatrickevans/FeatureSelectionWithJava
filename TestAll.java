@@ -24,6 +24,16 @@ public class TestAll {
     }
 
     @org.junit.Test
+    public void testSequentialForwardSelection(){
+        System.out.println("-------------------");
+        System.out.println("Sequential forward selection");
+        FeatureSelection selector = new SequentialForwardSelection(training, testing);
+        Set<Integer> selectedIndices = selector.select();
+        selector.compareTestingAccuracy(selectedIndices);
+        System.out.println("-------------------");
+    }
+
+    @org.junit.Test
     public void testSequentialForwardSelectionNumfeatures(){
         System.out.println("-------------------");
         System.out.println("Sequential forward selection for max 10 features");
@@ -34,14 +44,30 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialForwardSelection(){
+    public void testSequentialBackwardSelection(){
         System.out.println("-------------------");
-        System.out.println("Sequential forward selection");
-        FeatureSelection selector = new SequentialForwardSelection(training, testing);
+        System.out.println("Sequential backward selection");
+        FeatureSelection selector = new SequentialBackwardSelection(training, testing);
         Set<Integer> selectedIndices = selector.select();
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
     }
+
+    @org.junit.Test
+    public void testSequentialBackwardSelectionNumfeatures(){
+        System.out.println("-------------------");
+        System.out.println("Sequential backward selection for max 10 Features");
+        FeatureSelection selector = new SequentialBackwardSelection(training, testing);
+        Set<Integer> selectedIndices = selector.select(10);
+        selector.compareTestingAccuracy(selectedIndices);
+        System.out.println("-------------------");
+    }
+
+    /***
+     * ===============
+     * FLOATING METHODS
+     * ===============
+     */
 
     @org.junit.Test
     public void testSequentialFloatingForwardSelection(){
@@ -64,21 +90,21 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialBackwardSelectionNumfeatures(){
+    public void testSequentialBackwardFloatingSelection(){
         System.out.println("-------------------");
-        System.out.println("Sequential backward selection for max 10 Features");
-        FeatureSelection selector = new SequentialBackwardsSelection(training, testing);
-        Set<Integer> selectedIndices = selector.select(10);
+        System.out.println("Sequential backward floating selection");
+        FeatureSelection selector = new SequentialFloatingBackwardSelection(training, testing);
+        Set<Integer> selectedIndices = selector.select();
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
     }
 
     @org.junit.Test
-    public void testSequentialBackwardSelection(){
+    public void testSequentialBackwardFloatingSelectionNumFeatures(){
         System.out.println("-------------------");
-        System.out.println("Sequential backward selection");
-        FeatureSelection selector = new SequentialBackwardsSelection(training, testing);
-        Set<Integer> selectedIndices = selector.select();
+        System.out.println("Sequential backward floating selection for 10 features");
+        FeatureSelection selector = new SequentialFloatingBackwardSelection(training, testing);
+        Set<Integer> selectedIndices = selector.select(10);
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
     }
@@ -160,5 +186,6 @@ public class TestAll {
 
         return new Instance(features, label);
     }
+
 
 }
