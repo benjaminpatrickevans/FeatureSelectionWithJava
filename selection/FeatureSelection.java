@@ -130,10 +130,13 @@ public abstract class FeatureSelection {
         return classifier.classify(selectedFeatures);
     }
 
-    protected Set<Integer> getAllFeatureIndices() {
-        // Extract an instance to check the amount of features, assumes all trainingInstances have same # of features
+    protected int getNumFeatures(){
         Instance sampleInstance = trainingInstances.iterator().next();
-        int totalFeatures = sampleInstance.getNumFeatures();
+        return sampleInstance.getNumFeatures();
+    }
+
+    protected Set<Integer> getAllFeatureIndices() {
+        int totalFeatures = getNumFeatures();
 
         // Return a set from 0..totalFeatures
         return IntStream.rangeClosed(0, totalFeatures - 1)

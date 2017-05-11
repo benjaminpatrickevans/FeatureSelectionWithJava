@@ -19,7 +19,7 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
     }
 
     public Set<Integer> select(int maxNumFeatures) {
-        return select((noImprovement, size) -> size > maxNumFeatures || noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS);
+        return select((noImprovement, size) -> size > maxNumFeatures || noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS, maxNumFeatures);
     }
 
     public Set<Integer> select() {
@@ -27,6 +27,11 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
     }
 
     public Set<Integer> select(Criteria criteria) {
+        // Max features is all the features
+        return select(criteria, getNumFeatures());
+    }
+
+    private Set<Integer> select(Criteria criteria, int maxNumFeatures) {
         // In this case we have no data to use, so return the empty set
         if (trainingInstances == null || trainingInstances.isEmpty()) return new HashSet<Integer>();
 
@@ -84,8 +89,9 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
 
             accuracy = objectiveFunction(selectedFeatures);
 
-            // If the accuracy is higher than our previous best, or the same with less features
-            if (accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size())) {
+            // If the accuracy is higher than our previous best, or the same with less features and its a valid size (<= maxFeatures)
+            if ((accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size()))
+                    &&  selectedFeatures.size() <= maxNumFeatures) {
                 highestAccuracy = accuracy;
                 // Make a copy, so we don't accidentally modify this
                 bestSoFar = new HashSet<>(selectedFeatures);

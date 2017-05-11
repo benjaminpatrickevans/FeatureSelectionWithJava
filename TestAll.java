@@ -19,10 +19,8 @@ public class TestAll {
     private boolean wine = true;
 
     public TestAll() throws FileNotFoundException {
-
         if (wine) loadWineSet();
         else loadIsoletSet();
-
     }
 
     @org.junit.Test

@@ -28,21 +28,18 @@ public class SequentialBackwardSelection extends FeatureSelection {
         return select((noImprovement, size) -> noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS);
     }
 
-
-    public Set<Integer> select(Criteria criteria) {
-        return select(criteria, trainingInstances.size());
-    }
-
-
     /**
      * This method takes a criteria which just needs an evaluate method defined to work as the stopping criteria,
      * this allows us to reuse the general code for various stopping criterias.
      *
      * @param criteria
-     * @param maxNumFeatures
      * @return
      */
-    public Set<Integer> select(Criteria criteria, int maxNumFeatures) {
+    public Set<Integer> select(Criteria criteria) {
+        return select(criteria, getNumFeatures());
+    }
+
+    private Set<Integer> select(Criteria criteria, int maxNumFeatures) {
         // In this case we have no data to use, so return the empty set
         if (trainingInstances == null || trainingInstances.isEmpty()) return new HashSet<Integer>();
 
