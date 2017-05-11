@@ -5,16 +5,16 @@ import java.util.Set;
 
 /**
  * SFBS
- *
+ * <p>
  * Created by ben on 8/04/17.
  */
 public class SequentialFloatingBackwardSelection extends FeatureSelection {
 
-    public SequentialFloatingBackwardSelection(Set<Instance> instances){
+    public SequentialFloatingBackwardSelection(Set<Instance> instances) {
         super(instances);
     }
 
-    public SequentialFloatingBackwardSelection(Set<Instance> training, Set<Instance> testing){
+    public SequentialFloatingBackwardSelection(Set<Instance> training, Set<Instance> testing) {
         super(training, testing);
     }
 
@@ -45,7 +45,7 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
         // Number of iterations with no improvement
         double noImprovement = 0;
 
-        while (criteria.evaluate(noImprovement, selectedFeatures.size())){
+        while (criteria.evaluate(noImprovement, selectedFeatures.size())) {
 
             /* EXCLUDE THE WORST FEATURE */
             int worstFeature = worst(selectedFeatures);
@@ -61,7 +61,7 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
 
             /* INCLUDE THE BEST FEATURES */
             // Now add the best features, while we are improving
-            while (true){
+            while (true) {
                 int bestFeature = best(selectedFeatures, remainingFeatures);
 
                 // No more valid features
@@ -85,15 +85,15 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
             accuracy = objectiveFunction(selectedFeatures);
 
             // If the accuracy is higher than our previous best, or the same with less features
-            if (accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size())){
+            if (accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size())) {
                 highestAccuracy = accuracy;
                 // Make a copy, so we don't accidentally modify this
                 bestSoFar = new HashSet<>(selectedFeatures);
             }
 
-            if (Double.compare(accuracy, lastAccuracy) <= 0){
+            if (Double.compare(accuracy, lastAccuracy) <= 0) {
                 noImprovement++;
-            } else{
+            } else {
                 noImprovement = 0;
             }
 

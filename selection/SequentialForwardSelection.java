@@ -8,16 +8,16 @@ import java.util.Set;
  */
 public class SequentialForwardSelection extends FeatureSelection {
 
-    public SequentialForwardSelection(Set<Instance> instances){
+    public SequentialForwardSelection(Set<Instance> instances) {
         super(instances);
     }
 
-    public SequentialForwardSelection(Set<Instance> training, Set<Instance> testing){
+    public SequentialForwardSelection(Set<Instance> training, Set<Instance> testing) {
         super(training, testing);
     }
 
     public Set<Integer> select(int maxNumFeatures) {
-       return select((accuracy, size) -> size < maxNumFeatures);
+        return select((accuracy, size) -> size < maxNumFeatures);
     }
 
     public Set<Integer> select() {
@@ -43,7 +43,7 @@ public class SequentialForwardSelection extends FeatureSelection {
         // Number of iterations with no improvement
         double noImprovement = 0;
 
-        while (criteria.evaluate(noImprovement, selectedFeatures.size())){
+        while (criteria.evaluate(noImprovement, selectedFeatures.size())) {
             int feature = best(selectedFeatures, remainingFeatures);
             // No more valid features
             if (feature == -1) break;
@@ -54,15 +54,15 @@ public class SequentialForwardSelection extends FeatureSelection {
 
             accuracy = objectiveFunction(selectedFeatures);
 
-            if (accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size())){
+            if (accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size())) {
                 highestAccuracy = accuracy;
                 // Make a copy, so we don't accidentally modify the best subset
                 bestSoFar = new HashSet<>(selectedFeatures);
             }
 
-            if (Double.compare(accuracy, lastAccuracy) <= 0){
+            if (Double.compare(accuracy, lastAccuracy) <= 0) {
                 noImprovement++;
-            } else{
+            } else {
                 noImprovement = 0;
             }
             lastAccuracy = accuracy;

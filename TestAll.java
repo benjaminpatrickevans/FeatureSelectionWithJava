@@ -2,7 +2,9 @@ import selection.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
 
 
 /**
@@ -18,13 +20,13 @@ public class TestAll {
 
     public TestAll() throws FileNotFoundException {
 
-        if(wine) loadWineSet();
+        if (wine) loadWineSet();
         else loadIsoletSet();
 
     }
 
     @org.junit.Test
-    public void testSequentialForwardSelection(){
+    public void testSequentialForwardSelection() {
         System.out.println("-------------------");
         System.out.println("Sequential forward selection");
         FeatureSelection selector = new SequentialForwardSelection(training, testing);
@@ -34,7 +36,7 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialForwardSelectionNumfeatures(){
+    public void testSequentialForwardSelectionNumfeatures() {
         System.out.println("-------------------");
         System.out.println("Sequential forward selection for max 10 features");
         FeatureSelection selector = new SequentialForwardSelection(training, testing);
@@ -44,7 +46,7 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialBackwardSelection(){
+    public void testSequentialBackwardSelection() {
         System.out.println("-------------------");
         System.out.println("Sequential backward selection");
         FeatureSelection selector = new SequentialBackwardSelection(training, testing);
@@ -54,7 +56,7 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialBackwardSelectionNumfeatures(){
+    public void testSequentialBackwardSelectionNumfeatures() {
         System.out.println("-------------------");
         System.out.println("Sequential backward selection for max 10 Features");
         FeatureSelection selector = new SequentialBackwardSelection(training, testing);
@@ -70,7 +72,7 @@ public class TestAll {
      */
 
     @org.junit.Test
-    public void testSequentialFloatingForwardSelection(){
+    public void testSequentialFloatingForwardSelection() {
         System.out.println("-------------------");
         System.out.println("Sequential floating forward selection");
         FeatureSelection selector = new SequentialFloatingForwardSelection(training, testing);
@@ -80,7 +82,7 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialFloatingForwardSelectionNumFeatures(){
+    public void testSequentialFloatingForwardSelectionNumFeatures() {
         System.out.println("-------------------");
         System.out.println("Sequential floating forward selection for 5 features");
         FeatureSelection selector = new SequentialFloatingForwardSelection(training, testing);
@@ -90,7 +92,7 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialBackwardFloatingSelection(){
+    public void testSequentialBackwardFloatingSelection() {
         System.out.println("-------------------");
         System.out.println("Sequential backward floating selection");
         FeatureSelection selector = new SequentialFloatingBackwardSelection(training, testing);
@@ -100,7 +102,7 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialBackwardFloatingSelectionNumFeatures(){
+    public void testSequentialBackwardFloatingSelectionNumFeatures() {
         System.out.println("-------------------");
         System.out.println("Sequential backward floating selection for 10 features");
         FeatureSelection selector = new SequentialFloatingBackwardSelection(training, testing);
@@ -113,18 +115,18 @@ public class TestAll {
         Scanner scanner = new Scanner(new File("src/res/wine.data"));
         Set<Instance> instances = new HashSet<Instance>();
 
-        while (scanner.hasNext()){
+        while (scanner.hasNext()) {
             String line = scanner.nextLine();
             Instance wine = createWine(line);
             instances.add(wine);
         }
 
         // Split the data 70:30 into training and testing sets
-        int trainingSize = (int)(instances.size()*0.7);
+        int trainingSize = (int) (instances.size() * 0.7);
 
         int count = 0;
-        for (Instance instance: instances){
-            if(count++ < trainingSize) training.add(instance);
+        for (Instance instance : instances) {
+            if (count++ < trainingSize) training.add(instance);
             else testing.add(instance);
         }
     }
@@ -137,14 +139,15 @@ public class TestAll {
         System.out.println("Testing size: " + testing.size());
 
     }
+
     private Set<Instance> loadIsoletSet(boolean training) throws FileNotFoundException {
         String file = training ? "training" : "testing";
-        Scanner scanner = new Scanner(new File("src/res/isolet-"+file+".data"));
+        Scanner scanner = new Scanner(new File("src/res/isolet-" + file + ".data"));
         Set<Instance> instances = new HashSet<Instance>();
 
         int occurences = 0;
 
-        while (scanner.hasNext() && occurences++ < 500){
+        while (scanner.hasNext() && occurences++ < 500) {
             String line = scanner.nextLine();
             Instance isolet = createIsolet(line);
             instances.add(isolet);
@@ -152,9 +155,9 @@ public class TestAll {
         return instances;
     }
 
-    private Instance createIsolet(String line){
+    private Instance createIsolet(String line) {
         // Trim final character (fullstop), and split at commas
-        String[] split = line.substring(0, line.length() -1).split("\\s*,\\s*");
+        String[] split = line.substring(0, line.length() - 1).split("\\s*,\\s*");
 
         // Last item is class label
         String label = split[split.length - 1];
@@ -162,14 +165,14 @@ public class TestAll {
         double[] features = new double[split.length - 1];
 
         // Start at 0, split.length - 1 since final item is label
-        for (int i = 0; i < split.length - 1; i++){
+        for (int i = 0; i < split.length - 1; i++) {
             features[i] = Double.parseDouble(split[i]);
         }
 
         return new Instance(features, label);
     }
 
-    private Instance createWine(String line){
+    private Instance createWine(String line) {
         //Example: 1,14.23,1.71,2.43,15.6,127,2.8,3.06,.28,2.29,5.64,1.04,3.92,1065
         String[] split = line.split("\\s*,\\s*");
 
@@ -179,7 +182,7 @@ public class TestAll {
         double[] features = new double[split.length - 1];
 
         // Start at 1, as first index is label
-        for (int i = 1; i < split.length; i++){
+        for (int i = 1; i < split.length; i++) {
             String feature = split[i];
             features[i - 1] = Double.parseDouble(feature);
         }

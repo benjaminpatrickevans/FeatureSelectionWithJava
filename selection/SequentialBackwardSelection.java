@@ -8,11 +8,11 @@ import java.util.Set;
  */
 public class SequentialBackwardSelection extends FeatureSelection {
 
-    public SequentialBackwardSelection(Set<Instance> instances){
+    public SequentialBackwardSelection(Set<Instance> instances) {
         super(instances);
     }
 
-    public SequentialBackwardSelection(Set<Instance> training, Set<Instance> testing){
+    public SequentialBackwardSelection(Set<Instance> training, Set<Instance> testing) {
         super(training, testing);
     }
 
@@ -37,6 +37,7 @@ public class SequentialBackwardSelection extends FeatureSelection {
     /**
      * This method takes a criteria which just needs an evaluate method defined to work as the stopping criteria,
      * this allows us to reuse the general code for various stopping criterias.
+     *
      * @param criteria
      * @param maxNumFeatures
      * @return
@@ -57,7 +58,7 @@ public class SequentialBackwardSelection extends FeatureSelection {
         // Number of iterations with no improvement
         double noImprovement = 0;
 
-        while (criteria.evaluate(noImprovement, selectedFeatures.size())){
+        while (criteria.evaluate(noImprovement, selectedFeatures.size())) {
             int feature = worst(selectedFeatures);
 
             // No more valid features
@@ -76,9 +77,9 @@ public class SequentialBackwardSelection extends FeatureSelection {
                 bestSoFar = new HashSet<>(selectedFeatures);
             }
 
-            if (Double.compare(accuracy, lastAccuracy) <= 0){
+            if (Double.compare(accuracy, lastAccuracy) <= 0) {
                 noImprovement++;
-            } else{
+            } else {
                 noImprovement = 0;
             }
             lastAccuracy = accuracy;

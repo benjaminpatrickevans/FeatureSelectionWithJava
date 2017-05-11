@@ -1,15 +1,17 @@
 package clasification;
 
-import java.util.*;
+import selection.Instance;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.PriorityQueue;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import selection.Instance;
 
 
 /**
- * Classifier to use as the evaluation criteria
- * for feature selection. K-Nearest neighbour is
- * implemented here due to its simplicity.
+ * K Nearest Neighbour implemented here as a classifier.
  */
 public class KNearestNeighbour extends Classifier {
 
@@ -18,7 +20,6 @@ public class KNearestNeighbour extends Classifier {
 
     public KNearestNeighbour(Set<Instance> instances) {
         super(instances);
-
     }
 
     /**
@@ -26,23 +27,27 @@ public class KNearestNeighbour extends Classifier {
      * of correct classification. Uses every feature
      * available in the trainingInstances.
      */
-    public double classify(){
+    public double classify() {
+        // Get the total number of features, assumes all instances have the same #
         Instance sampleInstance = training.iterator().next();
         int totalFeatures = sampleInstance.getNumFeatures();
 
-        // We are using all features
-        Set<Integer> allIndices =  IntStream.rangeClosed(0, totalFeatures - 1)
+        // Create a set from 0..totalFeatures
+        Set<Integer> allIndices = IntStream.rangeClosed(0, totalFeatures - 1)
                 .boxed().collect(Collectors.toSet());
 
+        // Use the method below to avoid rewriting all the code
         return classify(allIndices);
     }
+
     /**
      * Classifies and returns the percentage
      * of correct classifications. Only uses the specified indices
      * for comparing trainingInstances.
      */
     public double classify(Set<Integer> indices) {
-        int correct = 0;
+        // The number of correctly classified instances
+        int numCorrect = 0;
 
         for (Instance instance : testing) {
             //Keep neighbours in queue, to get the K closest neighbours quickly
@@ -61,7 +66,7 @@ public class KNearestNeighbour extends Classifier {
 
             // Take the K closest neighbours
             Result[] closestNeighbours = new Result[K];
-            for(int i=0; i < K; i++){
+            for (int i = 0; i < K; i++) {
                 closestNeighbours[i] = neighbours.poll();
             }
 
@@ -69,18 +74,19 @@ public class KNearestNeighbour extends Classifier {
             String type = mostCommonType(closestNeighbours);
 
             // If we correctly classified the instance
-            if(type.equals(instance.getLabel())){
-                correct++;
+            if (type.equals(instance.getLabel())) {
+                numCorrect++;
             }
         }
 
         // Return the percentage of correct classifications
-        return correct/(double)testing.size();
+        return numCorrect / (double) testing.size();
     }
 
 
     /**
      * Returns the mode of @param list
+     *
      * @param list
      * @return
      */
@@ -127,11 +133,6 @@ public class KNearestNeighbour extends Classifier {
         public Result(String type, double distance) {
             this.CLASS = type;
             this.DISTANCE = distance;
-        }
-
-        @Override
-        public String toString() {
-            return DISTANCE + " " + CLASS;
         }
     }
 
