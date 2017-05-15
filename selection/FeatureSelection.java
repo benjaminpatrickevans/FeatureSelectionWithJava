@@ -4,7 +4,9 @@ import clasification.Classifier;
 import clasification.KNearestNeighbour;
 import helper.Normalize;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -18,11 +20,11 @@ public abstract class FeatureSelection {
     // The number of iterations to try if no improvement is made
     protected final int MAX_ITERATIONS_WITHOUT_PROGRESS = 5;
     // Training instances to be used in evaluation
-    protected Set<Instance> trainingInstances = new HashSet<Instance>();
+    protected List<Instance> trainingInstances = new ArrayList<>();
     // The classifier to use
     private Classifier classifier;
     // Testing instances only ever used to check performance of learnt features
-    private Set<Instance> testingInstances = new HashSet<Instance>();
+    private List<Instance> testingInstances = new ArrayList<Instance>();
 
     /**
      * If only a single set is provided, the attributes of each instance
@@ -30,7 +32,7 @@ public abstract class FeatureSelection {
      *
      * @param instances
      */
-    public FeatureSelection(Set<Instance> instances) {
+    public FeatureSelection(List<Instance> instances) {
         int trainingSize = (int) (instances.size() * 0.7);
 
         int count = 0;
@@ -45,7 +47,7 @@ public abstract class FeatureSelection {
         this.classifier = new KNearestNeighbour(trainingInstances);
     }
 
-    public FeatureSelection(Set<Instance> trainingInstances, Set<Instance> testingInstances) {
+    public FeatureSelection(List<Instance> trainingInstances, List<Instance> testingInstances) {
         this.trainingInstances = trainingInstances;
         this.testingInstances = testingInstances;
 

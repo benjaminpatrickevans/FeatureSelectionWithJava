@@ -3,6 +3,7 @@ package helper;
 import selection.Instance;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -17,7 +18,7 @@ public class Normalize {
      * @param trainingInstances
      * @param testingInstances
      */
-    public static void normalize(Set<Instance> trainingInstances, Set<Instance> testingInstances) {
+    public static void normalize(List<Instance> trainingInstances, List<Instance> testingInstances) {
         Map<Integer, Values> featureValues = new HashMap<Integer, Values>();
 
         // First run through the training data getting min and max of all features
@@ -48,7 +49,7 @@ public class Normalize {
         scale(testingInstances, featureValues);
     }
 
-    public static void scale(Set<Instance> instances, Map<Integer, Values> featureValues) {
+    public static void scale(List<Instance> instances, Map<Integer, Values> featureValues) {
 
         // Now scale all our training data
         for (Instance instance : instances) {

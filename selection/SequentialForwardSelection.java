@@ -1,6 +1,7 @@
 package selection;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -8,11 +9,11 @@ import java.util.Set;
  */
 public class SequentialForwardSelection extends FeatureSelection {
 
-    public SequentialForwardSelection(Set<Instance> instances) {
+    public SequentialForwardSelection(List<Instance> instances) {
         super(instances);
     }
 
-    public SequentialForwardSelection(Set<Instance> training, Set<Instance> testing) {
+    public SequentialForwardSelection(List<Instance> training, List<Instance> testing) {
         super(training, testing);
     }
 

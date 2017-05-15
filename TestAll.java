@@ -1,10 +1,11 @@
+import org.junit.BeforeClass;
 import selection.*;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
+
+import static org.junit.Assert.assertTrue;
 
 
 /**
@@ -12,11 +13,11 @@ import java.util.Set;
  */
 public class TestAll {
 
-    private Set<Instance> training = new HashSet<Instance>();
-    private Set<Instance> testing = new HashSet<Instance>();
+    private List<Instance> training = new ArrayList<Instance>();
+    private List<Instance> testing = new ArrayList<Instance>();
 
     // Wine or isolet
-    private boolean wine = true;
+    private boolean wine = false;
 
     public TestAll() throws FileNotFoundException {
         if (wine) loadWineSet();
@@ -35,12 +36,14 @@ public class TestAll {
 
     @org.junit.Test
     public void testSequentialForwardSelectionNumfeatures() {
+        int maxFeatures = 10;
         System.out.println("-------------------");
-        System.out.println("Sequential forward selection for max 10 features");
+        System.out.println("Sequential forward selection for max " + maxFeatures + " features");
         FeatureSelection selector = new SequentialForwardSelection(training, testing);
-        Set<Integer> selectedIndices = selector.select(10);
+        Set<Integer> selectedIndices = selector.select(maxFeatures);
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
+        assertTrue(selectedIndices.size() <= maxFeatures);
     }
 
     @org.junit.Test
@@ -55,12 +58,14 @@ public class TestAll {
 
     @org.junit.Test
     public void testSequentialBackwardSelectionNumfeatures() {
+        int maxFeatures = 10;
         System.out.println("-------------------");
-        System.out.println("Sequential backward selection for max 10 Features");
+        System.out.println("Sequential backward selection for max " + maxFeatures + " Features");
         FeatureSelection selector = new SequentialBackwardSelection(training, testing);
-        Set<Integer> selectedIndices = selector.select(10);
+        Set<Integer> selectedIndices = selector.select(maxFeatures);
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
+        assertTrue(selectedIndices.size() <= maxFeatures);
     }
 
     /***
@@ -81,12 +86,15 @@ public class TestAll {
 
     @org.junit.Test
     public void testSequentialFloatingForwardSelectionNumFeatures() {
+        int maxFeatures = 5;
         System.out.println("-------------------");
-        System.out.println("Sequential floating forward selection for 5 features");
+        System.out.println("Sequential floating forward selection for " + maxFeatures + " features");
         FeatureSelection selector = new SequentialFloatingForwardSelection(training, testing);
-        Set<Integer> selectedIndices = selector.select(5);
+        Set<Integer> selectedIndices = selector.select(maxFeatures);
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
+        assertTrue(selectedIndices.size() <= maxFeatures);
+
     }
 
     @org.junit.Test
@@ -101,23 +109,27 @@ public class TestAll {
 
     @org.junit.Test
     public void testSequentialBackwardFloatingSelectionNumFeatures() {
+        int maxFeatures = 10;
         System.out.println("-------------------");
-        System.out.println("Sequential backward floating selection for 10 features");
+        System.out.println("Sequential backward floating selection for " + maxFeatures + " features");
         FeatureSelection selector = new SequentialFloatingBackwardSelection(training, testing);
-        Set<Integer> selectedIndices = selector.select(10);
+        Set<Integer> selectedIndices = selector.select(maxFeatures);
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
+        assertTrue(selectedIndices.size() <= maxFeatures);
     }
 
     private void loadWineSet() throws FileNotFoundException {
         Scanner scanner = new Scanner(new File("src/res/wine.data"));
-        Set<Instance> instances = new HashSet<Instance>();
+        List<Instance> instances = new ArrayList<>();
 
         while (scanner.hasNext()) {
             String line = scanner.nextLine();
             Instance wine = createWine(line);
             instances.add(wine);
         }
+
+        Collections.shuffle(instances, new Random(408962927));
 
         // Split the data 70:30 into training and testing sets
         int trainingSize = (int) (instances.size() * 0.7);
@@ -138,10 +150,11 @@ public class TestAll {
 
     }
 
-    private Set<Instance> loadIsoletSet(boolean training) throws FileNotFoundException {
+    private List<Instance> loadIsoletSet(boolean training) throws FileNotFoundException {
         String file = training ? "training" : "testing";
+        List<Instance> instances = training ? this.training : this.testing;
+
         Scanner scanner = new Scanner(new File("src/res/isolet-" + file + ".data"));
-        Set<Instance> instances = new HashSet<Instance>();
 
         int occurences = 0;
 

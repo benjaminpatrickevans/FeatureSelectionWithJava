@@ -2,10 +2,7 @@ package clasification;
 
 import selection.Instance;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.PriorityQueue;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -18,7 +15,7 @@ public class KNearestNeighbour extends Classifier {
     // How many neighbors to find
     private final int K = 3;
 
-    public KNearestNeighbour(Set<Instance> instances) {
+    public KNearestNeighbour(List<Instance> instances) {
         super(instances);
     }
 

@@ -2,7 +2,9 @@ package clasification;
 
 import selection.Instance;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -13,8 +15,8 @@ import java.util.Set;
 public abstract class Classifier {
 
     // Split the data into training and testing to prevent overfitting
-    Set<Instance> training = new HashSet<Instance>();
-    Set<Instance> testing = new HashSet<Instance>();
+    List<Instance> training = new ArrayList<Instance>();
+    List<Instance> testing = new ArrayList<Instance>();
 
     /**
      * If only a single set of instances is specified,
@@ -22,7 +24,7 @@ public abstract class Classifier {
      *
      * @param instances
      */
-    public Classifier(Set<Instance> instances) {
+    public Classifier(List<Instance> instances) {
         int trainingSize = (int) (instances.size() * 0.7);
 
         int count = 0;
