@@ -9,22 +9,29 @@ import java.util.Set;
  */
 public class SequentialBackwardSelection extends FeatureSelection {
 
-    public SequentialBackwardSelection(List<Instance> instances) {
+    public SequentialBackwardSelection(String file) throws Exception {
+        super(file);
+    }
+    public SequentialBackwardSelection(String training, String testing) throws Exception {
+        super(training, testing);
+    }
+
+    /*public SequentialBackwardSelection(List<Instance> instances) {
         super(instances);
     }
 
     public SequentialBackwardSelection(List<Instance> training, List<Instance> testing) {
         super(training, testing);
-    }
+    }*/
 
     @Override
-    public Set<Integer> select(int maxNumFeatures) {
+    public Set<Integer> select(int maxNumFeatures) throws Exception {
         // While we have too many features or the accuracy is still improving
         return select((noImprovement, size) -> size > maxNumFeatures || noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS, maxNumFeatures);
     }
 
     @Override
-    public Set<Integer> select() {
+    public Set<Integer> select() throws Exception {
         // While the accuracy is still improving
         return select((noImprovement, size) -> noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS);
     }
@@ -36,14 +43,11 @@ public class SequentialBackwardSelection extends FeatureSelection {
      * @param criteria
      * @return
      */
-    public Set<Integer> select(Criteria criteria) {
+    public Set<Integer> select(Criteria criteria) throws Exception {
         return select(criteria, getNumFeatures());
     }
 
-    private Set<Integer> select(Criteria criteria, int maxNumFeatures) {
-        // In this case we have no data to use, so return the empty set
-        if (trainingInstances == null || trainingInstances.isEmpty()) return new HashSet<Integer>();
-
+    private Set<Integer> select(Criteria criteria, int maxNumFeatures) throws Exception {
         // To begin with all features are selected
         Set<Integer> selectedFeatures = getAllFeatureIndices();
 
@@ -66,6 +70,8 @@ public class SequentialBackwardSelection extends FeatureSelection {
             selectedFeatures.remove(feature);
 
             accuracy = objectiveFunction(selectedFeatures);
+
+            System.out.println("Features are: " + selectedFeatures);
 
             // If this is the highest so far, and also valid (i.e < number of features required)
             if ((accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size()))

@@ -25,21 +25,21 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialForwardSelection() {
+    public void testSequentialForwardSelection() throws Exception {
         System.out.println("-------------------");
         System.out.println("Sequential forward selection");
-        FeatureSelection selector = new SequentialForwardSelection(training, testing);
+        FeatureSelection selector = new SequentialForwardSelection("wine.arff");
         Set<Integer> selectedIndices = selector.select();
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
     }
 
     @org.junit.Test
-    public void testSequentialForwardSelectionNumfeatures() {
+    public void testSequentialForwardSelectionNumfeatures() throws Exception {
         int maxFeatures = 10;
         System.out.println("-------------------");
         System.out.println("Sequential forward selection for max " + maxFeatures + " features");
-        FeatureSelection selector = new SequentialForwardSelection(training, testing);
+        FeatureSelection selector = new SequentialForwardSelection("wine.arff");
         Set<Integer> selectedIndices = selector.select(maxFeatures);
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
@@ -47,21 +47,21 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialBackwardSelection() {
+    public void testSequentialBackwardSelection() throws Exception {
         System.out.println("-------------------");
         System.out.println("Sequential backward selection");
-        FeatureSelection selector = new SequentialBackwardSelection(training, testing);
+        FeatureSelection selector = new SequentialBackwardSelection("wine.arff");
         Set<Integer> selectedIndices = selector.select();
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
     }
 
     @org.junit.Test
-    public void testSequentialBackwardSelectionNumfeatures() {
+    public void testSequentialBackwardSelectionNumfeatures() throws Exception {
         int maxFeatures = 10;
         System.out.println("-------------------");
         System.out.println("Sequential backward selection for max " + maxFeatures + " Features");
-        FeatureSelection selector = new SequentialBackwardSelection(training, testing);
+        FeatureSelection selector = new SequentialBackwardSelection("wine.arff");
         Set<Integer> selectedIndices = selector.select(maxFeatures);
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
@@ -75,21 +75,21 @@ public class TestAll {
      */
 
     @org.junit.Test
-    public void testSequentialFloatingForwardSelection() {
+    public void testSequentialFloatingForwardSelection() throws Exception {
         System.out.println("-------------------");
         System.out.println("Sequential floating forward selection");
-        FeatureSelection selector = new SequentialFloatingForwardSelection(training, testing);
+        FeatureSelection selector = new SequentialFloatingForwardSelection("wine.arff");
         Set<Integer> selectedIndices = selector.select();
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
     }
 
     @org.junit.Test
-    public void testSequentialFloatingForwardSelectionNumFeatures() {
+    public void testSequentialFloatingForwardSelectionNumFeatures() throws Exception {
         int maxFeatures = 5;
         System.out.println("-------------------");
         System.out.println("Sequential floating forward selection for " + maxFeatures + " features");
-        FeatureSelection selector = new SequentialFloatingForwardSelection(training, testing);
+        FeatureSelection selector = new SequentialFloatingForwardSelection("wine.arff");
         Set<Integer> selectedIndices = selector.select(maxFeatures);
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
@@ -98,26 +98,27 @@ public class TestAll {
     }
 
     @org.junit.Test
-    public void testSequentialBackwardFloatingSelection() {
+    public void testSequentialBackwardFloatingSelection() throws Exception {
         System.out.println("-------------------");
         System.out.println("Sequential backward floating selection");
-        FeatureSelection selector = new SequentialFloatingBackwardSelection(training, testing);
+        FeatureSelection selector = new SequentialFloatingBackwardSelection("wine.arff");
         Set<Integer> selectedIndices = selector.select();
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
     }
 
     @org.junit.Test
-    public void testSequentialBackwardFloatingSelectionNumFeatures() {
+    public void testSequentialBackwardFloatingSelectionNumFeatures() throws Exception {
         int maxFeatures = 10;
         System.out.println("-------------------");
         System.out.println("Sequential backward floating selection for " + maxFeatures + " features");
-        FeatureSelection selector = new SequentialFloatingBackwardSelection(training, testing);
+        FeatureSelection selector = new SequentialFloatingBackwardSelection("wine.arff");
         Set<Integer> selectedIndices = selector.select(maxFeatures);
         selector.compareTestingAccuracy(selectedIndices);
         System.out.println("-------------------");
         assertTrue(selectedIndices.size() <= maxFeatures);
     }
+
 
     private void loadWineSet() throws FileNotFoundException {
         Scanner scanner = new Scanner(new File("src/res/wine.data"));
@@ -144,10 +145,6 @@ public class TestAll {
     private void loadIsoletSet() throws FileNotFoundException {
         this.training = loadIsoletSet(true);
         this.testing = loadIsoletSet(false);
-
-        System.out.println("Training size: " + training.size());
-        System.out.println("Testing size: " + testing.size());
-
     }
 
     private List<Instance> loadIsoletSet(boolean training) throws FileNotFoundException {
@@ -156,9 +153,7 @@ public class TestAll {
 
         Scanner scanner = new Scanner(new File("src/res/isolet-" + file + ".data"));
 
-        int occurences = 0;
-
-        while (scanner.hasNext() && occurences++ < 500) {
+        while (scanner.hasNext()) {
             String line = scanner.nextLine();
             Instance isolet = createIsolet(line);
             instances.add(isolet);

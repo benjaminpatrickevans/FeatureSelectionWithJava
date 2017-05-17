@@ -9,26 +9,30 @@ import java.util.Set;
  */
 public class SequentialForwardSelection extends FeatureSelection {
 
-    public SequentialForwardSelection(List<Instance> instances) {
+    public SequentialForwardSelection(String file) throws Exception {
+        super(file);
+    }
+    public SequentialForwardSelection(String training, String testing) throws Exception {
+        super(training, testing);
+    }
+
+    /*public SequentialForwardSelection(List<Instance> instances) {
         super(instances);
     }
 
     public SequentialForwardSelection(List<Instance> training, List<Instance> testing) {
         super(training, testing);
-    }
+    }*/
 
-    public Set<Integer> select(int maxNumFeatures) {
+    public Set<Integer> select(int maxNumFeatures) throws Exception {
         return select((accuracy, size) -> size < maxNumFeatures);
     }
 
-    public Set<Integer> select() {
+    public Set<Integer> select() throws Exception {
         return select((noImprovement, size) -> noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS);
     }
 
-    public Set<Integer> select(Criteria criteria) {
-        // In this case we have no data to use, so return the empty set
-        if (trainingInstances == null || trainingInstances.isEmpty()) return new HashSet<Integer>();
-
+    public Set<Integer> select(Criteria criteria) throws Exception {
         // To begin with no features are selected, so all the indices from 0..totalFeatures are remaining
         Set<Integer> remainingFeatures = getAllFeatureIndices();
 
@@ -55,7 +59,9 @@ public class SequentialForwardSelection extends FeatureSelection {
 
             accuracy = objectiveFunction(selectedFeatures);
 
-            if (accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size())) {
+            System.out.println("Accuracy: " + accuracy);
+
+            if (accuracy > highestAccuracy) {
                 highestAccuracy = accuracy;
                 // Make a copy, so we don't accidentally modify the best subset
                 bestSoFar = new HashSet<>(selectedFeatures);

@@ -11,30 +11,35 @@ import java.util.Set;
  */
 public class SequentialFloatingBackwardSelection extends FeatureSelection {
 
-    public SequentialFloatingBackwardSelection(List<Instance> instances) {
+    public SequentialFloatingBackwardSelection(String file) throws Exception {
+        super(file);
+    }
+    public SequentialFloatingBackwardSelection(String training, String testing) throws Exception {
+        super(training, testing);
+    }
+
+    /*public SequentialFloatingBackwardSelection(List<Instance> instances) {
         super(instances);
     }
 
     public SequentialFloatingBackwardSelection(List<Instance> training, List<Instance> testing) {
         super(training, testing);
-    }
+    }*/
 
-    public Set<Integer> select(int maxNumFeatures) {
+    public Set<Integer> select(int maxNumFeatures) throws Exception {
         return select((noImprovement, size) -> size > maxNumFeatures || noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS, maxNumFeatures);
     }
 
-    public Set<Integer> select() {
+    public Set<Integer> select() throws Exception {
         return select((noImprovement, size) -> noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS);
     }
 
-    public Set<Integer> select(Criteria criteria) {
+    public Set<Integer> select(Criteria criteria) throws Exception {
         // Max features is all the features
         return select(criteria, getNumFeatures());
     }
 
-    private Set<Integer> select(Criteria criteria, int maxNumFeatures) {
-        // In this case we have no data to use, so return the empty set
-        if (trainingInstances == null || trainingInstances.isEmpty()) return new HashSet<Integer>();
+    private Set<Integer> select(Criteria criteria, int maxNumFeatures) throws Exception {
 
         // To begin with all features are selected, so all the indices from 0..totalFeatures are remaining
         Set<Integer> selectedFeatures = getAllFeatureIndices();
@@ -47,6 +52,9 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
         Set<Integer> bestSoFar = new HashSet<>();
         double accuracy = objectiveFunction(selectedFeatures);
         double lastAccuracy = accuracy;
+
+        Set<Set<Integer>> visitedSubsets = new HashSet<Set<Integer>>();
+        visitedSubsets.add(new HashSet<>(selectedFeatures));
 
         // Number of iterations with no improvement
         double noImprovement = 0;
@@ -63,6 +71,8 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
             // Add the feature back to our remaining features
             remainingFeatures.add(worstFeature);
 
+            visitedSubsets.add(new HashSet<>(selectedFeatures));
+
             double accuracyBeforeAddition = objectiveFunction(selectedFeatures);
 
             /* INCLUDE THE BEST FEATURES */
@@ -78,13 +88,14 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
 
                 double accuracyAfterAddition = objectiveFunction(selectedFeatures);
 
-                // If the accuracy did not improve or we have just removed this feature, undo this step and continue removing features
-                if (accuracyAfterAddition < accuracyBeforeAddition || (bestFeature == worstFeature)) {
+                // If the accuracy did not improve or we have been to this state, undo this step and continue removing features
+                if (accuracyAfterAddition < accuracyBeforeAddition || visitedSubsets.contains(selectedFeatures)) {
                     selectedFeatures.remove(bestFeature);
                     remainingFeatures.add(bestFeature);
                     break;
                 }
 
+                visitedSubsets.add(new HashSet<>(selectedFeatures));
                 accuracyBeforeAddition = accuracyAfterAddition;
             }
 
