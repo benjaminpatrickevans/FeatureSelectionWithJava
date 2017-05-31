@@ -4,9 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * SFBS
- * <p>
- * Created by ben on 8/04/17.
+ * Performs Sequential Floating Backward Selection (SFBS)
+ *
+ * - Starts with full set of features
+ * - Removes the "worst" feature
+ * - Performs SFS as long as the objective function increases
+ * - Goes back to step 2 until stopping criteria is met
  */
 public class SequentialFloatingBackwardSelection extends FeatureSelection {
 

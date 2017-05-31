@@ -4,7 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by ben on 18/04/17.
+ * Performs Sequential Backward Selection (SBS)
+ *
+ * - Starts with full set of features
+ * - Repeatedly removes the "worst" feature until
+ * stopping criteria is met,
  */
 public class SequentialBackwardSelection extends FeatureSelection {
 

@@ -6,7 +6,9 @@ import java.util.Set;
 /**
  * Top level class for feature selection, holds the classifier
  * to use and has some helper functions such as selecting the
- * best and worst instances.
+ * best and worst instances. This is an abstract class, so
+ * should be extended to add a feature selection method -
+ * it can not be instantiated.
  */
 public abstract class FeatureSelection {
 
@@ -173,6 +175,27 @@ public abstract class FeatureSelection {
 
     protected boolean equalTo(double d1, double d2){
         return Double.compare(d1, d2) == 0;
+    }
+
+
+    /**
+     * This interface is used to specify the stopping criteria.
+     * Has one method (evaluate) which is passed to the selection methods,
+     * this allows us to use lambdas to pass a custom evaluation function
+     * for example (numIterations, size) -> numIterations < MAX_ITERATIONS_WITHOUT_PROGRESS.
+     */
+
+    protected interface Criteria {
+
+        /***
+         * Returns true if the custom specified criteria is true,
+         * otherwise false.
+         *
+         * @param numIterations
+         * @param size
+         * @return
+         */
+        boolean evaluate(double numIterations, int size);
     }
 
 }

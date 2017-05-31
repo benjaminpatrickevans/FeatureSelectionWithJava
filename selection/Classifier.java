@@ -1,7 +1,6 @@
 package selection;
 
 import weka.classifiers.*;
-import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.core.Instances;
@@ -18,7 +17,14 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * Created by ben on 15/05/17.
+ *  Reads isntances from file and splits them into
+ *
+ *  - Training: Used to train the model (classifier)
+ *  - Validation: Used to check performance throughout, avoid overfitting to training
+ *  - Testing: Used only at the end to evaluate learnt performance
+ *
+ *  This uses weka: http://www.cs.waikato.ac.nz/ml/weka/
+ *  both for the classifier and instances.
  */
 public class Classifier {
 

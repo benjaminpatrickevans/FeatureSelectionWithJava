@@ -4,7 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Created by ben on 8/04/17.
+ * Performs Sequential Floating Forward Selection (SFFS)
+ *
+ * - Starts with empty set of features
+ * - Adds the "best" feature
+ * - Performs SBS as long as the objective function increases
+ * - Goes back to step 2 until stopping criteria is met
  */
 public class SequentialFloatingForwardSelection extends FeatureSelection {
 
