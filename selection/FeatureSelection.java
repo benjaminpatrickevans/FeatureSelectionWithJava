@@ -1,70 +1,33 @@
 package selection;
 
-import clasification.Classifier;
-import clasification.KNearestNeighbour;
-import clasification.WekaClassifier;
-import helper.Normalize;
-
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * Top level class for feature selection, holds the classifier
- * to use and has some helper functions such as best and worst instances.
+ * to use and has some helper functions such as selecting the
+ * best and worst instances.
  */
 public abstract class FeatureSelection {
 
     // The number of iterations to try if no improvement is made
-    protected final int MAX_ITERATIONS_WITHOUT_PROGRESS = 300;
+    protected final int MAX_ITERATIONS_WITHOUT_PROGRESS = 10;
 
-    // Training instances to be used in evaluation
-    protected List<Instance> trainingInstances = new ArrayList<>();
-    // The classifier to use
-    private WekaClassifier classifier;
-    // Testing instances only ever used to check performance of learnt features
-    private List<Instance> testingInstances = new ArrayList<Instance>();
+    // The wrapped classifier to use
+    private Classifier classifier;
 
-    /**
-     * If only a single set is provided, the attributes of each instance
-     * will be scaled and then instances split 70:30 into training:testing.
-     *
-     * @param instances
-     */
-    /*public FeatureSelection(List<Instance> instances) {
-        int trainingSize = (int) (instances.size() * 0.7);
+    private final boolean DEBUG = true;
 
-        int count = 0;
-        for (Instance instance : instances) {
-            if (count++ < trainingSize) trainingInstances.add(instance);
-            else testingInstances.add(instance);
-        }
-
-        Normalize.normalize(trainingInstances, testingInstances);
-
-        // Only use the training instances for the classifier, avoid bias!
-        this.classifier = new KNearestNeighbour(trainingInstances);
+    public FeatureSelection (String fileName, int classIndex) throws Exception {
+        this.classifier = new Classifier(fileName);
+        //TODO: Only needed for musk
+        this.classifier.removeAttribute(0);
+        this.classifier.setClassIndex(classIndex);
     }
 
-    public FeatureSelection(List<Instance> trainingInstances, List<Instance> testingInstances) {
-        this.trainingInstances = trainingInstances;
-        this.testingInstances = testingInstances;
-
-        Normalize.normalize(trainingInstances, testingInstances);
-
-        // Only use the training instances for the classifier, avoid bias!
-        this.classifier = new KNearestNeighbour(trainingInstances);
-    }*/
-
-    public FeatureSelection (String fileName) throws Exception {
-        this.classifier = new WekaClassifier(fileName);
-    }
-
-    public FeatureSelection (String trainingFile, String testingFile) throws Exception {
-        this.classifier = new WekaClassifier(trainingFile, testingFile);
+    public FeatureSelection (String trainingFile, String testingFile, int classIndex) throws Exception {
+        this.classifier = new Classifier(trainingFile, testingFile);
+        this.classifier.setClassIndex(classIndex);
     }
 
     /**
@@ -87,8 +50,9 @@ public abstract class FeatureSelection {
     public abstract Set<Integer> select() throws Exception;
 
     /**
-     * Returns the feature in the remaining set of features
-     * which when added to the selectedFeatures maximises the objective function.
+     * Returns the index of the "best" feature in the remaining set of features,
+     * ie the feature which when added to the selectedFeatures maximises
+     * the objective function.
      *
      * @param selectedFeatures
      * @param remainingFeatures
@@ -113,7 +77,7 @@ public abstract class FeatureSelection {
     }
 
     /**
-     * Finds and returns the index of the worst feature,
+     * Finds and returns the index of the "worst" feature,
      * where worst is defined by the feature whose removal results in the
      * highest classification accuracy (i.e. an irrelevant or redundant feature)
      *
@@ -138,9 +102,48 @@ public abstract class FeatureSelection {
         return selected;
     }
 
+
+    /**
+     * Returns the classification accuracy on the validation
+     * set using the specified features
+     *
+     * @param selectedFeatures
+     * @return
+     * @throws Exception
+     */
     protected double objectiveFunction(Set<Integer> selectedFeatures) throws Exception {
         return classifier.classify(selectedFeatures);
     }
+
+
+    /***
+     * Uses the testing instances to check the performance
+     * of the selected indices, prints a summary of the results.
+     * @param selectedIndices
+     */
+    public void compareTestingAccuracy(Set<Integer> selectedIndices) throws Exception {
+        System.out.printf("Accuracy using all features: %.3f%%\n", classifier.testAccuracy());
+        System.out.printf("Accuracy using features (%s): %.3f%%\n", selectedIndices, classifier.testAccuracy(selectedIndices));
+    }
+
+
+    /**
+     * Prints out the size and accuracy at each iteration of selection.
+     * Only prints if DEBUG is set to true, does nothing otherwise.
+     *
+     * @param size
+     * @param accuracy
+     */
+    protected void printAccuracy (int size, double accuracy){
+        if(DEBUG) System.out.println(size + ": " + accuracy);
+    }
+
+    /***
+     * ===============
+     * GETTERS / SETTERS
+     * ===============
+     */
+
     protected int getNumFeatures() {
         return classifier.getNumFeatures();
     }
@@ -149,15 +152,27 @@ public abstract class FeatureSelection {
         return classifier.getAllFeatureIndices();
     }
 
+
     /***
-     * Uses the testing instances to check the performance
-     * of the selected indices, prints a summary of the results.
-     * @param selectedIndices
+     * ===============
+     * HELPER METHODS FOR DEALING WITH FLOATING POINT PRECISION EASILY
+     * ===============
      */
-    public void compareTestingAccuracy(Set<Integer> selectedIndices) throws Exception {
-        //Classifier testingClassifier = new KNearestNeighbour(testingInstances);
-        System.out.printf("Accuracy using all features: %.3f%%\n", classifier.testAccuracy());
-        System.out.printf("Accuracy using features (%s): %.3f%%\n", selectedIndices, classifier.testAccuracy(selectedIndices));
+
+    protected boolean greaterThan(double d1, double d2){
+        return Double.compare(d1, d2) > 0;
+    }
+
+    protected boolean lessThan(double d1, double d2){
+        return Double.compare(d1, d2) < 0;
+    }
+
+    protected boolean lessThanOrEqualTo(double d1, double d2){
+        return Double.compare(d1, d2) <= 0;
+    }
+
+    protected boolean equalTo(double d1, double d2){
+        return Double.compare(d1, d2) == 0;
     }
 
 }

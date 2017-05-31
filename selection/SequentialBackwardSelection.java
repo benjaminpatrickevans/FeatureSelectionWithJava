@@ -1,7 +1,6 @@
 package selection;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -9,20 +8,12 @@ import java.util.Set;
  */
 public class SequentialBackwardSelection extends FeatureSelection {
 
-    public SequentialBackwardSelection(String file) throws Exception {
-        super(file);
+    public SequentialBackwardSelection(String file, int classIndex) throws Exception {
+        super(file, classIndex);
     }
-    public SequentialBackwardSelection(String training, String testing) throws Exception {
-        super(training, testing);
+    public SequentialBackwardSelection(String training, String testing, int classIndex) throws Exception {
+        super(training, testing, classIndex);
     }
-
-    /*public SequentialBackwardSelection(List<Instance> instances) {
-        super(instances);
-    }
-
-    public SequentialBackwardSelection(List<Instance> training, List<Instance> testing) {
-        super(training, testing);
-    }*/
 
     @Override
     public Set<Integer> select(int maxNumFeatures) throws Exception {
@@ -44,6 +35,7 @@ public class SequentialBackwardSelection extends FeatureSelection {
      * @return
      */
     public Set<Integer> select(Criteria criteria) throws Exception {
+        // Just pass in the total number of features as the max number
         return select(criteria, getNumFeatures());
     }
 
@@ -57,10 +49,12 @@ public class SequentialBackwardSelection extends FeatureSelection {
         double accuracy = objectiveFunction(selectedFeatures);
         double lastAccuracy = accuracy;
 
-        // Number of iterations with no improvement
-        double noImprovement = 0;
+        printAccuracy(selectedFeatures.size(), accuracy);
 
-        while (criteria.evaluate(noImprovement, selectedFeatures.size())) {
+        // Number of iterations with no improvement
+        double iterationsWithoutImprovement = 0;
+
+        while (criteria.evaluate(iterationsWithoutImprovement, selectedFeatures.size())) {
             int feature = worst(selectedFeatures);
 
             // No more valid features
@@ -71,24 +65,29 @@ public class SequentialBackwardSelection extends FeatureSelection {
 
             accuracy = objectiveFunction(selectedFeatures);
 
-            System.out.println("Features are: " + selectedFeatures);
-
             // If this is the highest so far, and also valid (i.e < number of features required)
-            if ((accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size()))
+            if ((greaterThan(accuracy, highestAccuracy) || (equalTo(accuracy, highestAccuracy) && selectedFeatures.size() < bestSoFar.size()))
                     && selectedFeatures.size() <= maxNumFeatures) {
                 highestAccuracy = accuracy;
                 // Make a copy, so we don't accidentally modify this
                 bestSoFar = new HashSet<>(selectedFeatures);
             }
 
-            if (Double.compare(accuracy, lastAccuracy) <= 0) {
-                noImprovement++;
+            if (lessThanOrEqualTo(accuracy, lastAccuracy)) {
+                iterationsWithoutImprovement++;
             } else {
-                noImprovement = 0;
+                iterationsWithoutImprovement = 0;
             }
+
             lastAccuracy = accuracy;
+
+            printAccuracy(selectedFeatures.size(), accuracy);
         }
 
         return bestSoFar;
     }
+
+
+
+
 }

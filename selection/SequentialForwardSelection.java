@@ -1,7 +1,6 @@
 package selection;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -9,20 +8,12 @@ import java.util.Set;
  */
 public class SequentialForwardSelection extends FeatureSelection {
 
-    public SequentialForwardSelection(String file) throws Exception {
-        super(file);
+    public SequentialForwardSelection(String file, int classIndex) throws Exception {
+        super(file, classIndex);
     }
-    public SequentialForwardSelection(String training, String testing) throws Exception {
-        super(training, testing);
+    public SequentialForwardSelection(String training, String testing, int classIndex) throws Exception {
+        super(training, testing, classIndex);
     }
-
-    /*public SequentialForwardSelection(List<Instance> instances) {
-        super(instances);
-    }
-
-    public SequentialForwardSelection(List<Instance> training, List<Instance> testing) {
-        super(training, testing);
-    }*/
 
     public Set<Integer> select(int maxNumFeatures) throws Exception {
         return select((accuracy, size) -> size < maxNumFeatures);
@@ -45,6 +36,8 @@ public class SequentialForwardSelection extends FeatureSelection {
         double accuracy = objectiveFunction(selectedFeatures);
         double lastAccuracy = accuracy;
 
+        printAccuracy(selectedFeatures.size(), accuracy);
+
         // Number of iterations with no improvement
         double noImprovement = 0;
 
@@ -59,15 +52,15 @@ public class SequentialForwardSelection extends FeatureSelection {
 
             accuracy = objectiveFunction(selectedFeatures);
 
-            System.out.println("Accuracy: " + accuracy);
-
-            if (accuracy > highestAccuracy) {
+            if (greaterThan(accuracy, highestAccuracy)) {
                 highestAccuracy = accuracy;
                 // Make a copy, so we don't accidentally modify the best subset
                 bestSoFar = new HashSet<>(selectedFeatures);
             }
 
-            if (Double.compare(accuracy, lastAccuracy) <= 0) {
+            printAccuracy(selectedFeatures.size(), accuracy);
+
+            if (lessThanOrEqualTo(accuracy, lastAccuracy)) {
                 noImprovement++;
             } else {
                 noImprovement = 0;

@@ -1,7 +1,6 @@
 package selection;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -11,20 +10,12 @@ import java.util.Set;
  */
 public class SequentialFloatingBackwardSelection extends FeatureSelection {
 
-    public SequentialFloatingBackwardSelection(String file) throws Exception {
-        super(file);
+    public SequentialFloatingBackwardSelection(String file, int classIndex) throws Exception {
+        super(file, classIndex);
     }
-    public SequentialFloatingBackwardSelection(String training, String testing) throws Exception {
-        super(training, testing);
+    public SequentialFloatingBackwardSelection(String training, String testing, int classIndex) throws Exception {
+        super(training, testing, classIndex);
     }
-
-    /*public SequentialFloatingBackwardSelection(List<Instance> instances) {
-        super(instances);
-    }
-
-    public SequentialFloatingBackwardSelection(List<Instance> training, List<Instance> testing) {
-        super(training, testing);
-    }*/
 
     public Set<Integer> select(int maxNumFeatures) throws Exception {
         return select((noImprovement, size) -> size > maxNumFeatures || noImprovement < MAX_ITERATIONS_WITHOUT_PROGRESS, maxNumFeatures);
@@ -53,13 +44,16 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
         double accuracy = objectiveFunction(selectedFeatures);
         double lastAccuracy = accuracy;
 
+        // Keep track of the visited states to avoid getting stuck in an infinite loop
         Set<Set<Integer>> visitedSubsets = new HashSet<Set<Integer>>();
         visitedSubsets.add(new HashSet<>(selectedFeatures));
 
         // Number of iterations with no improvement
-        double noImprovement = 0;
+        int iterationsWithoutImprovement = 0;
 
-        while (criteria.evaluate(noImprovement, selectedFeatures.size())) {
+        printAccuracy(selectedFeatures.size(), accuracy);
+
+        while (criteria.evaluate(iterationsWithoutImprovement, selectedFeatures.size())) {
 
             /* EXCLUDE THE WORST FEATURE */
             int worstFeature = worst(selectedFeatures);
@@ -67,13 +61,17 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
             // No more valid features
             if (worstFeature == -1) break;
 
+            // Remove the feature and add the feature back to our remaining features
             selectedFeatures.remove(worstFeature);
-            // Add the feature back to our remaining features
             remainingFeatures.add(worstFeature);
 
+            // Note that we have been to this state
             visitedSubsets.add(new HashSet<>(selectedFeatures));
 
+            // This will be our point of comparison when adding features
             double accuracyBeforeAddition = objectiveFunction(selectedFeatures);
+
+            printAccuracy(selectedFeatures.size(), accuracyBeforeAddition);
 
             /* INCLUDE THE BEST FEATURES */
             // Now add the best features, while we are improving
@@ -88,31 +86,36 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
 
                 double accuracyAfterAddition = objectiveFunction(selectedFeatures);
 
+                printAccuracy(selectedFeatures.size(), accuracyAfterAddition);
+
                 // If the accuracy did not improve or we have been to this state, undo this step and continue removing features
-                if (accuracyAfterAddition < accuracyBeforeAddition || visitedSubsets.contains(selectedFeatures)) {
+                if (lessThan(accuracyAfterAddition, accuracyBeforeAddition) || visitedSubsets.contains(selectedFeatures)) {
                     selectedFeatures.remove(bestFeature);
                     remainingFeatures.add(bestFeature);
                     break;
                 }
 
+                // Note that we have been to this state
                 visitedSubsets.add(new HashSet<>(selectedFeatures));
+
+                // This will be our new point of comparison for the next addition to the selected features
                 accuracyBeforeAddition = accuracyAfterAddition;
             }
 
             accuracy = objectiveFunction(selectedFeatures);
 
             // If the accuracy is higher than our previous best, or the same with less features and its a valid size (<= maxFeatures)
-            if ((accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size()))
+            if ((greaterThan(accuracy, highestAccuracy) || (equalTo(accuracy, highestAccuracy) && selectedFeatures.size() < bestSoFar.size()))
                     &&  selectedFeatures.size() <= maxNumFeatures) {
                 highestAccuracy = accuracy;
-                // Make a copy, so we don't accidentally modify this
+                // Save our best set
                 bestSoFar = new HashSet<>(selectedFeatures);
             }
 
-            if (Double.compare(accuracy, lastAccuracy) <= 0) {
-                noImprovement++;
+            if (lessThanOrEqualTo(accuracy, lastAccuracy)) {
+                iterationsWithoutImprovement++;
             } else {
-                noImprovement = 0;
+                iterationsWithoutImprovement = 0;
             }
 
             lastAccuracy = accuracy;

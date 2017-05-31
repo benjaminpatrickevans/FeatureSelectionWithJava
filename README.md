@@ -7,11 +7,12 @@ Common feature selection algorithms implemented in Java, including
 - [Sequential Forward Floating Selection (SFFS)](selection/SequentialFloatingForwardSelection.java)
 - [Sequential Backward Floating Selection (SFBS)](selection/SequentialFloatingBackwardSelection.java)
 
-This uses a Wrapper approach, utilising K-NN as a classifier.
+This uses a Wrapper approach, utilising the Weka library as a classifier.
 
 Datasets used for testing:
 
 - [WINE](https://archive.ics.uci.edu/ml/datasets/wine) (13 Features)
+- [MUSK V1](https://archive.ics.uci.edu/ml/datasets/Musk+(Version+1)) (168 features)
 - [ISOLET](https://archive.ics.uci.edu/ml/datasets/ISOLET) (617 features)
 
 Sample output from WINE dataset on random training:testing (70:30) split of the data

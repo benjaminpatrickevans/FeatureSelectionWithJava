@@ -1,7 +1,6 @@
 package selection;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -9,20 +8,12 @@ import java.util.Set;
  */
 public class SequentialFloatingForwardSelection extends FeatureSelection {
 
-    public SequentialFloatingForwardSelection(String file) throws Exception {
-        super(file);
+    public SequentialFloatingForwardSelection(String file, int classIndex) throws Exception {
+        super(file, classIndex);
     }
-    public SequentialFloatingForwardSelection(String training, String testing) throws Exception {
-        super(training, testing);
+    public SequentialFloatingForwardSelection(String training, String testing, int classIndex) throws Exception {
+        super(training, testing, classIndex);
     }
-
-    /*public SequentialFloatingForwardSelection(List<Instance> instances) {
-        super(instances);
-    }
-
-    public SequentialFloatingForwardSelection(List<Instance> training, List<Instance> testing) {
-        super(training, testing);
-    }*/
 
     public Set<Integer> select(int maxNumFeatures) throws Exception {
         return select((accuracy, size) -> size < maxNumFeatures);
@@ -45,6 +36,8 @@ public class SequentialFloatingForwardSelection extends FeatureSelection {
         double accuracy = objectiveFunction(selectedFeatures);
         double lastAccuracy = accuracy;
 
+        printAccuracy(selectedFeatures.size(), accuracy);
+
         Set<Set<Integer>> visitedSubsets = new HashSet<Set<Integer>>();
         visitedSubsets.add(new HashSet<>(selectedFeatures));
 
@@ -66,6 +59,7 @@ public class SequentialFloatingForwardSelection extends FeatureSelection {
             visitedSubsets.add(new HashSet<>(selectedFeatures));
 
             double accuracyBeforeRemoval = objectiveFunction(selectedFeatures);
+            printAccuracy(selectedFeatures.size(), accuracyBeforeRemoval);
 
             /* EXCLUDE THE WORST FEATURES */
             // Now remove the worst features, while we are improving
@@ -81,8 +75,10 @@ public class SequentialFloatingForwardSelection extends FeatureSelection {
 
                 double accuracyAfterRemoval = objectiveFunction(selectedFeatures);
 
+                printAccuracy(selectedFeatures.size(), accuracyAfterRemoval);
+
                 // If the accuracy did not improve or we have already been to this state, undo this step and continue adding features
-                if (accuracyAfterRemoval < accuracyBeforeRemoval || visitedSubsets.contains(selectedFeatures)) {
+                if (lessThan(accuracyAfterRemoval, accuracyBeforeRemoval) || visitedSubsets.contains(selectedFeatures)) {
                     selectedFeatures.add(worstFeature);
                     remainingFeatures.remove(worstFeature);
                     break;
@@ -95,13 +91,13 @@ public class SequentialFloatingForwardSelection extends FeatureSelection {
             accuracy = objectiveFunction(selectedFeatures);
 
             // If the accuracy is higher than our previous best, or the same with less features
-            if (accuracy > highestAccuracy || (accuracy == highestAccuracy && selectedFeatures.size() < bestSoFar.size())) {
+            if (greaterThan(accuracy, highestAccuracy) || (equalTo(accuracy, highestAccuracy) && selectedFeatures.size() < bestSoFar.size())) {
                 highestAccuracy = accuracy;
                 // Make a copy, so we don't accidentally modify this
                 bestSoFar = new HashSet<>(selectedFeatures);
             }
 
-            if (Double.compare(accuracy, lastAccuracy) <= 0) {
+            if (lessThanOrEqualTo(accuracy, lastAccuracy)) {
                 noImprovement++;
             } else {
                 noImprovement = 0;
