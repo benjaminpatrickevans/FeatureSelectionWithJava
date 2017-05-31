@@ -6,8 +6,15 @@ import static org.junit.Assert.assertTrue;
 
 
 /**
- * Created by ben on 18/04/17.
+ * Runs the four selection methods against a given
+ * dataset. This is a useful class for running all the
+ * code at once and checking the output.
+ *
+ * The only tests this actually does is checks
+ * the size of the subsets returned from the numFeatures
+ * methods is less than or equal to the specified size.
  */
+
 public class TestAll {
 
     // Since weka treats attributes and classes uniformly, must explicitly state class indiex
@@ -129,18 +136,29 @@ public class TestAll {
      */
 
     private FeatureSelection generateSelector(Selection method) throws Exception {
+        FeatureSelection selector = null;
         switch (method){
             case SBS:
-                return new SequentialBackwardSelection(FILE_NAME, CLASS_INDEX);
+                selector = new SequentialBackwardSelection(FILE_NAME, CLASS_INDEX);
+                break;
             case SFS:
-                return new SequentialForwardSelection(FILE_NAME, CLASS_INDEX);
+                selector = new SequentialForwardSelection(FILE_NAME, CLASS_INDEX);
+                break;
             case SFBS:
-                return new SequentialFloatingBackwardSelection(FILE_NAME, CLASS_INDEX);
+                selector = new SequentialFloatingBackwardSelection(FILE_NAME, CLASS_INDEX);
+                break;
             case SFFS:
-                return new SequentialFloatingForwardSelection(FILE_NAME, CLASS_INDEX);
-            default:
-                return null;
+                selector = new SequentialFloatingForwardSelection(FILE_NAME, CLASS_INDEX);
+                break;
         }
+
+        // Special case for musk
+        if(FILE_NAME.equals("musk.arff")){
+            // There is a "giveaway" feature (molecule_name) which stores some class information
+            selector.removeAttribute(0);
+        }
+
+        return selector;
     }
 
     private enum Selection {

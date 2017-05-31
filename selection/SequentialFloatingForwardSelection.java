@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * Performs Sequential Floating Forward Selection (SFFS)
- *
+ * <p>
  * - Starts with empty set of features
  * - Adds the "best" feature
  * - Performs SBS as long as the objective function increases
@@ -16,6 +16,7 @@ public class SequentialFloatingForwardSelection extends FeatureSelection {
     public SequentialFloatingForwardSelection(String file, int classIndex) throws Exception {
         super(file, classIndex);
     }
+
     public SequentialFloatingForwardSelection(String training, String testing, int classIndex) throws Exception {
         super(training, testing, classIndex);
     }

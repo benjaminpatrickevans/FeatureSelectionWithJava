@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * Performs Sequential Backward Selection (SBS)
- *
+ * <p>
  * - Starts with full set of features
  * - Repeatedly removes the "worst" feature until
  * stopping criteria is met,
@@ -15,6 +15,7 @@ public class SequentialBackwardSelection extends FeatureSelection {
     public SequentialBackwardSelection(String file, int classIndex) throws Exception {
         super(file, classIndex);
     }
+
     public SequentialBackwardSelection(String training, String testing, int classIndex) throws Exception {
         super(training, testing, classIndex);
     }
@@ -90,8 +91,6 @@ public class SequentialBackwardSelection extends FeatureSelection {
 
         return bestSoFar;
     }
-
-
 
 
 }

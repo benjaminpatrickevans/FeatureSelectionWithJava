@@ -5,7 +5,7 @@ import java.util.Set;
 
 /**
  * Performs Sequential Floating Backward Selection (SFBS)
- *
+ * <p>
  * - Starts with full set of features
  * - Removes the "worst" feature
  * - Performs SFS as long as the objective function increases
@@ -16,6 +16,7 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
     public SequentialFloatingBackwardSelection(String file, int classIndex) throws Exception {
         super(file, classIndex);
     }
+
     public SequentialFloatingBackwardSelection(String training, String testing, int classIndex) throws Exception {
         super(training, testing, classIndex);
     }
@@ -109,7 +110,7 @@ public class SequentialFloatingBackwardSelection extends FeatureSelection {
 
             // If the accuracy is higher than our previous best, or the same with less features and its a valid size (<= maxFeatures)
             if ((greaterThan(accuracy, highestAccuracy) || (equalTo(accuracy, highestAccuracy) && selectedFeatures.size() < bestSoFar.size()))
-                    &&  selectedFeatures.size() <= maxNumFeatures) {
+                    && selectedFeatures.size() <= maxNumFeatures) {
                 highestAccuracy = accuracy;
                 // Save our best set
                 bestSoFar = new HashSet<>(selectedFeatures);

@@ -14,23 +14,20 @@ public abstract class FeatureSelection {
 
     // The number of iterations to try if no improvement is made
     protected final int MAX_ITERATIONS_WITHOUT_PROGRESS = 10;
-
+    private final boolean DEBUG = true;
     // The wrapped classifier to use
     private Classifier classifier;
 
-    private final boolean DEBUG = true;
-
-    public FeatureSelection (String fileName, int classIndex) throws Exception {
+    public FeatureSelection(String fileName, int classIndex) throws Exception {
         this.classifier = new Classifier(fileName);
-        //TODO: Only needed for musk
-        this.classifier.removeAttribute(0);
         this.classifier.setClassIndex(classIndex);
     }
 
-    public FeatureSelection (String trainingFile, String testingFile, int classIndex) throws Exception {
+    public FeatureSelection(String trainingFile, String testingFile, int classIndex) throws Exception {
         this.classifier = new Classifier(trainingFile, testingFile);
         this.classifier.setClassIndex(classIndex);
     }
+
 
     /**
      * Returns a subset of only the most important features,
@@ -117,6 +114,17 @@ public abstract class FeatureSelection {
         return classifier.classify(selectedFeatures);
     }
 
+    /**
+     * Removes the specified attribute, this is useful if the dataset
+     * has extra "information" variables that give away the class.
+     *
+     * @param index
+     * @throws Exception
+     */
+    public void removeAttribute(int index) throws Exception {
+        this.classifier.removeAttribute(0);
+    }
+
 
     /***
      * Uses the testing instances to check the performance
@@ -136,8 +144,8 @@ public abstract class FeatureSelection {
      * @param size
      * @param accuracy
      */
-    protected void printAccuracy (int size, double accuracy){
-        if(DEBUG) System.out.println(size + ": " + accuracy);
+    protected void printAccuracy(int size, double accuracy) {
+        if (DEBUG) System.out.println(size + ": " + accuracy);
     }
 
     /***
@@ -161,19 +169,19 @@ public abstract class FeatureSelection {
      * ===============
      */
 
-    protected boolean greaterThan(double d1, double d2){
+    protected boolean greaterThan(double d1, double d2) {
         return Double.compare(d1, d2) > 0;
     }
 
-    protected boolean lessThan(double d1, double d2){
+    protected boolean lessThan(double d1, double d2) {
         return Double.compare(d1, d2) < 0;
     }
 
-    protected boolean lessThanOrEqualTo(double d1, double d2){
+    protected boolean lessThanOrEqualTo(double d1, double d2) {
         return Double.compare(d1, d2) <= 0;
     }
 
-    protected boolean equalTo(double d1, double d2){
+    protected boolean equalTo(double d1, double d2) {
         return Double.compare(d1, d2) == 0;
     }
 

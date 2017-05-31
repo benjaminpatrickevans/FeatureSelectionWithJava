@@ -1,6 +1,6 @@
 package selection;
 
-import weka.classifiers.*;
+import weka.classifiers.Evaluation;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.core.Instances;
@@ -17,14 +17,14 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- *  Reads isntances from file and splits them into
- *
- *  - Training: Used to train the model (classifier)
- *  - Validation: Used to check performance throughout, avoid overfitting to training
- *  - Testing: Used only at the end to evaluate learnt performance
- *
- *  This uses weka: http://www.cs.waikato.ac.nz/ml/weka/
- *  both for the classifier and instances.
+ * Reads isntances from file and splits them into
+ * <p>
+ * - Training: Used to train the model (classifier)
+ * - Validation: Used to check performance throughout, avoid overfitting to training
+ * - Testing: Used only at the end to evaluate learnt performance
+ * <p>
+ * This uses weka: http://www.cs.waikato.ac.nz/ml/weka/
+ * both for the classifier and instances.
  */
 public class Classifier {
 
@@ -40,7 +40,7 @@ public class Classifier {
     private int CLASS_INDEX;
 
     public Classifier(String fileName) throws Exception {
-        Instances instances =  readArffFile(fileName);
+        Instances instances = readArffFile(fileName);
         instances.randomize(new java.util.Random(123));
 
         int trainSize = (int) Math.round(instances.numInstances() * 0.6);
@@ -53,7 +53,7 @@ public class Classifier {
     }
 
     public Classifier(String trainingFileName, String testingFileName) throws Exception {
-        Instances instances =  readArffFile(trainingFileName);
+        Instances instances = readArffFile(trainingFileName);
         instances.randomize(new java.util.Random(0));
 
         int trainSize = (int) Math.round(instances.numInstances() * 0.8);
@@ -79,7 +79,7 @@ public class Classifier {
         return Filter.useFilter(instances, remove);
     }
 
-    public void setClassIndex(int index){
+    public void setClassIndex(int index) {
         this.CLASS_INDEX = index;
 
         training.setClassIndex(CLASS_INDEX);
@@ -89,6 +89,7 @@ public class Classifier {
 
     /**
      * The method of classification to use
+     *
      * @return
      * @throws Exception
      */
@@ -185,22 +186,22 @@ public class Classifier {
      * @param toKeep
      * @return
      */
-    private int[] remove(Set<Integer> toKeep){
+    private int[] remove(Set<Integer> toKeep) {
 
         List<Integer> toRemove = new ArrayList<Integer>();
 
-        for(int i=0; i<training.numAttributes(); i++){
-            if (!toKeep.contains(i) && i != CLASS_INDEX){
+        for (int i = 0; i < training.numAttributes(); i++) {
+            if (!toKeep.contains(i) && i != CLASS_INDEX) {
                 toRemove.add(i);
             }
         }
 
         // Convert list to int[]
-        return toRemove.stream().mapToInt(i->i).toArray();
+        return toRemove.stream().mapToInt(i -> i).toArray();
     }
 
 
-    private Instances readArffFile (String fileName) throws IOException{
+    private Instances readArffFile(String fileName) throws IOException {
         BufferedReader reader = new BufferedReader(
                 new FileReader("src/res/" + fileName));
 
@@ -209,7 +210,7 @@ public class Classifier {
         return instances;
     }
 
-    public int getNumFeatures(){
+    public int getNumFeatures() {
         return training.numAttributes();
     }
 
