@@ -11,12 +11,12 @@ import java.util.Set;
  */
 public class SequentialForwardSelection extends FeatureSelection {
 
-    public SequentialForwardSelection(String file, int classIndex) throws Exception {
-        super(file, classIndex);
+    public SequentialForwardSelection(String file, int classIndex, int maxIterationsWithoutProgress) throws Exception {
+        super(file, classIndex, maxIterationsWithoutProgress);
     }
 
-    public SequentialForwardSelection(String training, String testing, int classIndex) throws Exception {
-        super(training, testing, classIndex);
+    public SequentialForwardSelection(String training, String testing, int classIndex, int maxIterationsWithoutProgress) throws Exception {
+        super(training, testing, classIndex, maxIterationsWithoutProgress);
     }
 
     public Set<Integer> select(int maxNumFeatures) throws Exception {

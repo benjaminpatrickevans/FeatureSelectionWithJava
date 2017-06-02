@@ -13,19 +13,44 @@ import java.util.Set;
 public abstract class FeatureSelection {
 
     // The number of iterations to try if no improvement is made
-    protected final int MAX_ITERATIONS_WITHOUT_PROGRESS = 10;
+    protected final int MAX_ITERATIONS_WITHOUT_PROGRESS;
+
     private final boolean DEBUG = true;
+
     // The wrapped classifier to use
     private Classifier classifier;
 
-    public FeatureSelection(String fileName, int classIndex) throws Exception {
+    /**
+     * Creates a new FeatureSelection instance and classifier,
+     * splits the specified file into training:testing:validation
+     * sets for  use with the classifier.
+     *
+     * @param fileName The instances to read
+     * @param classIndex The feature to mark as the class
+     * @param maxIterationsWithoutProgress Max iterations to try if no improvement is made
+     * @throws Exception
+     */
+    public FeatureSelection(String fileName, int classIndex, int maxIterationsWithoutProgress) throws Exception {
         this.classifier = new Classifier(fileName);
         this.classifier.setClassIndex(classIndex);
+        this.MAX_ITERATIONS_WITHOUT_PROGRESS = maxIterationsWithoutProgress;
     }
 
-    public FeatureSelection(String trainingFile, String testingFile, int classIndex) throws Exception {
+    /**
+     * Creates a new FeatureSelection instance and classifier,
+     * splits the specified training file into training:validation sets
+     * and uses the testing file for testing the classifier.
+     *
+     * @param trainingFile The instances to read
+     * @param testingFile The instances to read
+     * @param classIndex The feature to mark as the class
+     * @param maxIterationsWithoutProgress Max iterations to try if no improvement is made
+     * @throws Exception
+     */
+    public FeatureSelection(String trainingFile, String testingFile, int classIndex, int maxIterationsWithoutProgress) throws Exception {
         this.classifier = new Classifier(trainingFile, testingFile);
         this.classifier.setClassIndex(classIndex);
+        this.MAX_ITERATIONS_WITHOUT_PROGRESS = maxIterationsWithoutProgress;
     }
 
 
@@ -117,12 +142,13 @@ public abstract class FeatureSelection {
     /**
      * Removes the specified attribute, this is useful if the dataset
      * has extra "information" variables that give away the class.
+     * Need to also specify the class index since it may change.
      *
      * @param index
      * @throws Exception
      */
-    public void removeAttribute(int index) throws Exception {
-        this.classifier.removeAttribute(0);
+    public void removeAttribute(int index, int classIndex) throws Exception {
+        this.classifier.removeAttribute(index, classIndex);
     }
 
 

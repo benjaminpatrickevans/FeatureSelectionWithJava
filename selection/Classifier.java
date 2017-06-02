@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
- * Reads isntances from file and splits them into
+ * Reads instances from file and splits them into
  * <p>
  * - Training: Used to train the model (classifier)
  * - Validation: Used to check performance throughout, avoid overfitting to training
@@ -29,66 +29,76 @@ import java.util.stream.IntStream;
 public class Classifier {
 
     // Data to learn model from
-    Instances training;
+    private Instances training;
 
     // Used to check performance of learnt model
-    Instances validation;
+    private Instances validation;
 
     // Only used for final evaluation
-    Instances testing;
+    private Instances testing;
 
     private int CLASS_INDEX;
 
     public Classifier(String fileName) throws Exception {
+        // Shuffle the data
         Instances instances = readArffFile(fileName);
         instances.randomize(new java.util.Random(123));
 
+        // Split 60:20:20 into training:validation:testing
         int trainSize = (int) Math.round(instances.numInstances() * 0.6);
         int validationSize = (int) Math.round(instances.numInstances() * 0.2);
         int testSize = instances.numInstances() - trainSize - validationSize;
 
+        // Set the fields
         this.training = new Instances(instances, 0, trainSize);
         this.validation = new Instances(instances, trainSize, validationSize);
         this.testing = new Instances(instances, trainSize + validationSize, testSize);
     }
 
     public Classifier(String trainingFileName, String testingFileName) throws Exception {
+        // Shuffle the training data
         Instances instances = readArffFile(trainingFileName);
-        instances.randomize(new java.util.Random(0));
+        instances.randomize(new java.util.Random(123));
 
+        // Split training data 80:20 into training:validation
         int trainSize = (int) Math.round(instances.numInstances() * 0.8);
         int validationSize = instances.numInstances() - trainSize;
 
+        // Set the fields
         this.training = new Instances(instances, 0, trainSize);
         this.validation = new Instances(instances, trainSize, validationSize);
         this.testing = readArffFile(testingFileName);
     }
 
-    public void removeAttribute(int index) throws Exception {
+    /**
+     * Removes the given attribute from all instances
+     *
+     * @param index
+     * @param classIndex
+     * @throws Exception
+     */
+    public void removeAttribute(int index, int classIndex) throws Exception {
         this.training = removeAttribute(index, training);
         this.validation = removeAttribute(index, validation);
         this.testing = removeAttribute(index, testing);
+
+        setClassIndex(classIndex);
     }
 
     private Instances removeAttribute(int index, Instances instances) throws Exception {
         Remove remove = new Remove();
         remove.setAttributeIndicesArray(new int[]{index});
         remove.setInvertSelection(false);
-
         remove.setInputFormat(instances);
+
         return Filter.useFilter(instances, remove);
     }
 
-    public void setClassIndex(int index) {
-        this.CLASS_INDEX = index;
 
-        training.setClassIndex(CLASS_INDEX);
-        testing.setClassIndex(CLASS_INDEX);
-        validation.setClassIndex(CLASS_INDEX);
-    }
 
     /**
-     * The method of classification to use
+     * Returns the classifier to use, in this case we
+     * use K-NN with K = 5.
      *
      * @return
      * @throws Exception
@@ -101,11 +111,19 @@ public class Classifier {
     }
 
 
+    /**
+     * Returns the validation set accuracy using only the specified
+     * features.
+     *
+     * @param indices
+     * @return
+     * @throws Exception
+     */
     public double classify(Set<Integer> indices) throws Exception {
         weka.classifiers.Classifier classifier = createClassifier();
 
         Remove rm = new Remove();
-        int[] remove = remove(indices);
+        int[] remove = allFeaturesExcept(indices);
         rm.setAttributeIndicesArray(remove);
         FilteredClassifier fc = new FilteredClassifier();
         fc.setFilter(rm);
@@ -144,7 +162,7 @@ public class Classifier {
 
         // Remove all attributes not in indices
         Remove rm = new Remove();
-        int[] remove = remove(indices);
+        int[] remove = allFeaturesExcept(indices);
         rm.setAttributeIndicesArray(remove);
         FilteredClassifier fc = new FilteredClassifier();
         fc.setFilter(rm);
@@ -172,6 +190,14 @@ public class Classifier {
         return eval.pctCorrect();
     }
 
+    /**
+     * Returns the classification accuracy of the testing set
+     * using the specified classifier with the training data
+     *
+     * @param classifier
+     * @return
+     * @throws Exception
+     */
     private double evaluateOnTesting(weka.classifiers.Classifier classifier) throws Exception {
         Evaluation eval = new Evaluation(training);
         eval.evaluateModel(classifier, testing);
@@ -180,13 +206,14 @@ public class Classifier {
 
     /**
      * Helper function which returns an array of
-     * all attributes to remove (the indices which are not
+     * all attributes from 0..numAttributes()
+     * except those which are specified in toKeep (i.e the indices which are not
      * in toKeep)
      *
-     * @param toKeep
-     * @return
+     * @param toKeep the feature indices to exclude from the returned array
+     * @return all of the features except those specified in toKeep
      */
-    private int[] remove(Set<Integer> toKeep) {
+    private int[] allFeaturesExcept(Set<Integer> toKeep) {
 
         List<Integer> toRemove = new ArrayList<Integer>();
 
@@ -225,6 +252,14 @@ public class Classifier {
 
         // Return a set from 0..totalFeatures
         return features;
+    }
+
+    public void setClassIndex(int index) {
+        this.CLASS_INDEX = index;
+
+        training.setClassIndex(CLASS_INDEX);
+        testing.setClassIndex(CLASS_INDEX);
+        validation.setClassIndex(CLASS_INDEX);
     }
 
 }

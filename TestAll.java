@@ -26,6 +26,12 @@ public class TestAll {
     // Maximum number of features to select
     private final int MAX_FEATURES = 50;
 
+    // Maximum iterations to keep trying with no progression in subset accuracy
+    private final int MAX_ITERATIONS_WITHOUT_PROGRESS = 10;
+
+    // Whether or not to run the num feature tests
+    private boolean numFeatureTests = false;
+
     /***
      * ===============
      * SFS TESTS
@@ -44,6 +50,7 @@ public class TestAll {
 
     @org.junit.Test
     public void testSequentialForwardSelectionNumfeatures() throws Exception {
+        if(!numFeatureTests) return;
         System.out.println("-------------------");
         System.out.println("Sequential forward selection for max " + MAX_FEATURES + " features");
         FeatureSelection selector = generateSelector(Selection.SFS);
@@ -71,6 +78,7 @@ public class TestAll {
 
     @org.junit.Test
     public void testSequentialBackwardSelectionNumfeatures() throws Exception {
+        if(!numFeatureTests) return;
         System.out.println("-------------------");
         System.out.println("Sequential backward selection for max " + MAX_FEATURES + " Features");
         FeatureSelection selector = generateSelector(Selection.SBS);
@@ -98,6 +106,7 @@ public class TestAll {
 
     @org.junit.Test
     public void testSequentialFloatingForwardSelectionNumFeatures() throws Exception {
+        if(!numFeatureTests) return;
         System.out.println("-------------------");
         System.out.println("Sequential floating forward selection for " + MAX_FEATURES + " features");
         FeatureSelection selector = generateSelector(Selection.SFFS);
@@ -120,6 +129,7 @@ public class TestAll {
 
     @org.junit.Test
     public void testSequentialFloatingBackwardSelectionNumFeatures() throws Exception {
+        if(!numFeatureTests) return;
         System.out.println("-------------------");
         System.out.println("Sequential backward floating selection for " + MAX_FEATURES + " features");
         FeatureSelection selector = generateSelector(Selection.SFBS);
@@ -139,23 +149,23 @@ public class TestAll {
         FeatureSelection selector = null;
         switch (method){
             case SBS:
-                selector = new SequentialBackwardSelection(FILE_NAME, CLASS_INDEX);
+                selector = new SequentialBackwardSelection(FILE_NAME, CLASS_INDEX, MAX_ITERATIONS_WITHOUT_PROGRESS);
                 break;
             case SFS:
-                selector = new SequentialForwardSelection(FILE_NAME, CLASS_INDEX);
+                selector = new SequentialForwardSelection(FILE_NAME, CLASS_INDEX, MAX_ITERATIONS_WITHOUT_PROGRESS);
                 break;
             case SFBS:
-                selector = new SequentialFloatingBackwardSelection(FILE_NAME, CLASS_INDEX);
+                selector = new SequentialFloatingBackwardSelection(FILE_NAME, CLASS_INDEX, MAX_ITERATIONS_WITHOUT_PROGRESS);
                 break;
             case SFFS:
-                selector = new SequentialFloatingForwardSelection(FILE_NAME, CLASS_INDEX);
+                selector = new SequentialFloatingForwardSelection(FILE_NAME, CLASS_INDEX, MAX_ITERATIONS_WITHOUT_PROGRESS);
                 break;
         }
 
         // Special case for musk
         if(FILE_NAME.equals("musk.arff")){
             // There is a "giveaway" feature (molecule_name) which stores some class information
-            selector.removeAttribute(0);
+            selector.removeAttribute(0, CLASS_INDEX);
         }
 
         return selector;
