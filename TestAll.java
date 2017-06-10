@@ -18,16 +18,16 @@ import static org.junit.Assert.assertTrue;
 public class TestAll {
 
     // File of instances to use
-    private final String FILE_NAME = "isoletTrain.arff";
+    private final String FILE_NAME = "res/musk.arff";
 
     // Only specify this if you have a testing file, otherwise leave null and above file will be split
-    private final String TESTING_FILE = "isoletTest.arff";;
+    private final String TESTING_FILE = null;
 
     // Maximum number of features to select
     private final int MAX_FEATURES = 50;
 
     // Maximum iterations to keep trying with no progression in subset accuracy
-    private final int MAX_ITERATIONS_WITHOUT_PROGRESS = 50;
+    private final int MAX_ITERATIONS_WITHOUT_PROGRESS = 10;
 
     // Whether or not to run the num feature tests
     private boolean numFeatureTests = false;

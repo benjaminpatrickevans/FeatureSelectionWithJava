@@ -231,7 +231,7 @@ public class Classifier {
 
     private Instances readArffFile(String fileName) throws IOException {
         BufferedReader reader = new BufferedReader(
-                new FileReader("src/res/" + fileName));
+                new FileReader(fileName));
 
         Instances instances = new Instances(reader);
         instances.setClass(instances.attribute("class"));
