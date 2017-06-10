@@ -9,6 +9,9 @@ Common feature selection algorithms implemented in Java, including
 
 This uses a Wrapper approach, utilising the Weka library as a classifier.
 
+To see how to use view the TestAll class, which guives an example of creating a new FeatureSelection
+object and shows how to utilise the various stopping methods.
+
 Datasets used for testing:
 
 - [WINE](https://archive.ics.uci.edu/ml/datasets/wine) (13 Features)

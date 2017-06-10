@@ -17,17 +17,17 @@ import static org.junit.Assert.assertTrue;
 
 public class TestAll {
 
-    // Since weka treats attributes and classes uniformly, must explicitly state class indiex
-    private final int CLASS_INDEX = 166;
-
     // File of instances to use
-    private final String FILE_NAME = "musk.arff";
+    private final String FILE_NAME = "isoletTrain.arff";
+
+    // Only specify this if you have a testing file, otherwise leave null and above file will be split
+    private final String TESTING_FILE = "isoletTest.arff";;
 
     // Maximum number of features to select
     private final int MAX_FEATURES = 50;
 
     // Maximum iterations to keep trying with no progression in subset accuracy
-    private final int MAX_ITERATIONS_WITHOUT_PROGRESS = 10;
+    private final int MAX_ITERATIONS_WITHOUT_PROGRESS = 50;
 
     // Whether or not to run the num feature tests
     private boolean numFeatureTests = false;
@@ -149,23 +149,23 @@ public class TestAll {
         FeatureSelection selector = null;
         switch (method){
             case SBS:
-                selector = new SequentialBackwardSelection(FILE_NAME, CLASS_INDEX, MAX_ITERATIONS_WITHOUT_PROGRESS);
+                selector = TESTING_FILE == null ? new SequentialBackwardSelection(FILE_NAME, MAX_ITERATIONS_WITHOUT_PROGRESS) : new SequentialBackwardSelection(FILE_NAME, TESTING_FILE, MAX_ITERATIONS_WITHOUT_PROGRESS);
                 break;
             case SFS:
-                selector = new SequentialForwardSelection(FILE_NAME, CLASS_INDEX, MAX_ITERATIONS_WITHOUT_PROGRESS);
+                selector = TESTING_FILE == null ? new SequentialForwardSelection(FILE_NAME, MAX_ITERATIONS_WITHOUT_PROGRESS) : new SequentialForwardSelection(FILE_NAME, TESTING_FILE, MAX_ITERATIONS_WITHOUT_PROGRESS);
                 break;
             case SFBS:
-                selector = new SequentialFloatingBackwardSelection(FILE_NAME, CLASS_INDEX, MAX_ITERATIONS_WITHOUT_PROGRESS);
+                selector = TESTING_FILE == null ? new SequentialFloatingBackwardSelection(FILE_NAME, MAX_ITERATIONS_WITHOUT_PROGRESS) : new SequentialFloatingBackwardSelection(FILE_NAME, TESTING_FILE, MAX_ITERATIONS_WITHOUT_PROGRESS);
                 break;
             case SFFS:
-                selector = new SequentialFloatingForwardSelection(FILE_NAME, CLASS_INDEX, MAX_ITERATIONS_WITHOUT_PROGRESS);
+                selector = TESTING_FILE == null ? new SequentialFloatingForwardSelection(FILE_NAME, MAX_ITERATIONS_WITHOUT_PROGRESS) : new SequentialFloatingForwardSelection(FILE_NAME, TESTING_FILE, MAX_ITERATIONS_WITHOUT_PROGRESS);
                 break;
         }
 
         // Special case for musk
         if(FILE_NAME.equals("musk.arff")){
             // There is a "giveaway" feature (molecule_name) which stores some class information
-            selector.removeAttribute(0, CLASS_INDEX);
+            selector.removeAttribute(0);
         }
 
         return selector;

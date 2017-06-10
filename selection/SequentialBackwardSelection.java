@@ -12,12 +12,12 @@ import java.util.Set;
  */
 public class SequentialBackwardSelection extends FeatureSelection {
 
-    public SequentialBackwardSelection(String file, int classIndex, int maxIterationsWithoutProgress) throws Exception {
-        super(file, classIndex, maxIterationsWithoutProgress);
+    public SequentialBackwardSelection(String file, int maxIterationsWithoutProgress) throws Exception {
+        super(file, maxIterationsWithoutProgress);
     }
 
-    public SequentialBackwardSelection(String training, String testing, int classIndex, int maxIterationsWithoutProgress) throws Exception {
-        super(training, testing, classIndex, maxIterationsWithoutProgress);
+    public SequentialBackwardSelection(String training, String testing, int maxIterationsWithoutProgress) throws Exception {
+        super(training, testing, maxIterationsWithoutProgress);
     }
 
     @Override

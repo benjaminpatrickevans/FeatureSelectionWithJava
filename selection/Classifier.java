@@ -1,7 +1,7 @@
 package selection;
 
 import weka.classifiers.Evaluation;
-import weka.classifiers.lazy.IBk;
+import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.meta.FilteredClassifier;
 import weka.core.Instances;
 import weka.filters.Filter;
@@ -37,12 +37,11 @@ public class Classifier {
     // Only used for final evaluation
     private Instances testing;
 
-    private int CLASS_INDEX;
-
     public Classifier(String fileName) throws Exception {
         // Shuffle the data
         Instances instances = readArffFile(fileName);
         instances.randomize(new java.util.Random(123));
+        instances.setClass(instances.attribute("class"));
 
         // Split 60:20:20 into training:validation:testing
         int trainSize = (int) Math.round(instances.numInstances() * 0.6);
@@ -59,6 +58,7 @@ public class Classifier {
         // Shuffle the training data
         Instances instances = readArffFile(trainingFileName);
         instances.randomize(new java.util.Random(123));
+        instances.setClass(instances.attribute("class"));
 
         // Split training data 80:20 into training:validation
         int trainSize = (int) Math.round(instances.numInstances() * 0.8);
@@ -70,6 +70,7 @@ public class Classifier {
         this.testing = readArffFile(testingFileName);
     }
 
+
     /**
      * Removes the given attribute from all instances
      *
@@ -77,12 +78,12 @@ public class Classifier {
      * @param classIndex
      * @throws Exception
      */
-    public void removeAttribute(int index, int classIndex) throws Exception {
+    public void removeAttribute(int index) throws Exception {
         this.training = removeAttribute(index, training);
         this.validation = removeAttribute(index, validation);
         this.testing = removeAttribute(index, testing);
 
-        setClassIndex(classIndex);
+        setClass();
     }
 
     private Instances removeAttribute(int index, Instances instances) throws Exception {
@@ -105,9 +106,9 @@ public class Classifier {
      */
     private weka.classifiers.Classifier createClassifier() throws Exception {
         // Swap the lines out below out to use a different classifier
-        IBk classifier = new IBk();
-        classifier.setKNN(5);
-        return classifier;
+        //IBk classifier = new IBk();
+        //classifier.setKNN(5);
+         return new NaiveBayes();
     }
 
 
@@ -218,7 +219,7 @@ public class Classifier {
         List<Integer> toRemove = new ArrayList<Integer>();
 
         for (int i = 0; i < training.numAttributes(); i++) {
-            if (!toKeep.contains(i) && i != CLASS_INDEX) {
+            if (!toKeep.contains(i) && i != training.classIndex()) {
                 toRemove.add(i);
             }
         }
@@ -233,7 +234,7 @@ public class Classifier {
                 new FileReader("src/res/" + fileName));
 
         Instances instances = new Instances(reader);
-        instances.setClassIndex(CLASS_INDEX);
+        instances.setClass(instances.attribute("class"));
         return instances;
     }
 
@@ -248,18 +249,17 @@ public class Classifier {
                 .boxed().collect(Collectors.toSet());
 
         // Class shouldnt be considered a feature
-        features.remove(CLASS_INDEX);
+        features.remove(training.classIndex());
+
 
         // Return a set from 0..totalFeatures
         return features;
     }
 
-    public void setClassIndex(int index) {
-        this.CLASS_INDEX = index;
-
-        training.setClassIndex(CLASS_INDEX);
-        testing.setClassIndex(CLASS_INDEX);
-        validation.setClassIndex(CLASS_INDEX);
+    public void setClass() {
+        training.setClass(training.classAttribute());
+        testing.setClass(training.classAttribute());
+        validation.setClass(training.classAttribute());
     }
 
 }

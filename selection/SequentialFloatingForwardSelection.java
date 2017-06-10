@@ -13,12 +13,12 @@ import java.util.Set;
  */
 public class SequentialFloatingForwardSelection extends FeatureSelection {
 
-    public SequentialFloatingForwardSelection(String file, int classIndex, int maxIterationsWithoutProgress) throws Exception {
-        super(file, classIndex, maxIterationsWithoutProgress);
+    public SequentialFloatingForwardSelection(String file, int maxIterationsWithoutProgress) throws Exception {
+        super(file, maxIterationsWithoutProgress);
     }
 
-    public SequentialFloatingForwardSelection(String training, String testing, int classIndex, int maxIterationsWithoutProgress) throws Exception {
-        super(training, testing, classIndex, maxIterationsWithoutProgress);
+    public SequentialFloatingForwardSelection(String training, String testing, int maxIterationsWithoutProgress) throws Exception {
+        super(training, testing, maxIterationsWithoutProgress);
     }
 
     public Set<Integer> select(int maxNumFeatures) throws Exception {

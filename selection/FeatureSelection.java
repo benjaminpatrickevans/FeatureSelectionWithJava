@@ -26,13 +26,11 @@ public abstract class FeatureSelection {
      * sets for  use with the classifier.
      *
      * @param fileName The instances to read
-     * @param classIndex The feature to mark as the class
      * @param maxIterationsWithoutProgress Max iterations to try if no improvement is made
      * @throws Exception
      */
-    public FeatureSelection(String fileName, int classIndex, int maxIterationsWithoutProgress) throws Exception {
+    public FeatureSelection(String fileName, int maxIterationsWithoutProgress) throws Exception {
         this.classifier = new Classifier(fileName);
-        this.classifier.setClassIndex(classIndex);
         this.MAX_ITERATIONS_WITHOUT_PROGRESS = maxIterationsWithoutProgress;
     }
 
@@ -47,9 +45,8 @@ public abstract class FeatureSelection {
      * @param maxIterationsWithoutProgress Max iterations to try if no improvement is made
      * @throws Exception
      */
-    public FeatureSelection(String trainingFile, String testingFile, int classIndex, int maxIterationsWithoutProgress) throws Exception {
+    public FeatureSelection(String trainingFile, String testingFile, int maxIterationsWithoutProgress) throws Exception {
         this.classifier = new Classifier(trainingFile, testingFile);
-        this.classifier.setClassIndex(classIndex);
         this.MAX_ITERATIONS_WITHOUT_PROGRESS = maxIterationsWithoutProgress;
     }
 
@@ -105,15 +102,15 @@ public abstract class FeatureSelection {
      * where worst is defined by the feature whose removal results in the
      * highest classification accuracy (i.e. an irrelevant or redundant feature)
      *
-     * @param features
+     * @param selectedFeatures
      * @return
      */
-    protected int worst(Set<Integer> features) throws Exception {
+    protected int worst(Set<Integer> selectedFeatures) throws Exception {
         double highestAccuracy = -Integer.MAX_VALUE;
         int selected = -1;
 
-        for (int feature : features) {
-            Set<Integer> newFeatures = new HashSet<>(features);
+        for (int feature : selectedFeatures) {
+            Set<Integer> newFeatures = new HashSet<>(selectedFeatures);
             newFeatures.remove(feature);
 
             double result = objectiveFunction(newFeatures);
@@ -147,8 +144,8 @@ public abstract class FeatureSelection {
      * @param index
      * @throws Exception
      */
-    public void removeAttribute(int index, int classIndex) throws Exception {
-        this.classifier.removeAttribute(index, classIndex);
+    public void removeAttribute(int index) throws Exception {
+        this.classifier.removeAttribute(index);
     }
 
 
